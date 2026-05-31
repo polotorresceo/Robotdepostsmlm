@@ -1208,9 +1208,18 @@ input[readonly], select[disabled] {
       <button class="admin-lock-btn" onclick="deployFunnel()">🔒 LOCK &amp; DEPLOY FUNNEL — TROPICALIZAR PARA ESTE PARTNER</button>
     </div>
 
-    <!-- Deployed badge -->
-    <div id="deployedBadge">
+    <!-- Deployed badge + botón de re-edición del admin -->
+    <div id="deployedBadge" style="text-align:center; padding:10px 0;">
       <span class="deployed-ribbon">✦ FUNNEL SYSTEM POLO ACTIVADO · LISTO PARA GENERAR RESULTADOS ✦</span>
+      <div style="margin-top:14px;">
+        <button id="reEditBtn" onclick="openAdminEdit()"
+          style="padding:10px 24px; border:1px solid rgba(201,168,76,0.45); border-radius:30px;
+                 background:rgba(201,168,76,0.07); color:var(--gold-lt);
+                 font-family:'Share Tech Mono',monospace; font-size:0.6rem;
+                 letter-spacing:0.25em; cursor:pointer; transition:all 0.3s;">
+          ✎ EDITAR DATOS DEL PARTNER
+        </button>
+      </div>
     </div>
 
   </div>
@@ -1581,35 +1590,116 @@ input[readonly], select[disabled] {
 ══════════════════════════════════════════════════════ */
 const ADMIN_PASSWORD = "SystemPolo2026";
 
+/*
+ * ══════════════════════════════════════════════════════════════
+ *  MÁQUINA DE ESTADOS DEL PANEL ADMIN — 3 estados posibles:
+ *
+ *  ESTADO A: Sin deploy previo
+ *    adminLogin visible · adminPanel oculto · deployedBadge oculto
+ *    funnelBody oculto
+ *
+ *  ESTADO B: Admin autenticado (editando)
+ *    adminLogin oculto · adminPanel visible · deployedBadge oculto
+ *    funnelBody visible (si había deploy previo)
+ *
+ *  ESTADO C: Funnel deployado (partner usa el funnel)
+ *    adminLogin oculto · adminPanel oculto · deployedBadge visible
+ *    funnelBody visible
+ *
+ *  Transiciones:
+ *    A → B : checkAdminPw() con contraseña correcta
+ *    B → C : deployFunnel()
+ *    C → B : openAdminEdit()  ← botón "Editar datos del Partner"
+ * ══════════════════════════════════════════════════════════════
+ */
+
+/* Función auxiliar: aplica un estado visual de UI limpio */
+function setAdminState(state) {
+  const adminLogin    = document.getElementById('adminLogin');
+  const adminPanel    = document.getElementById('adminPanel');
+  const deployedBadge = document.getElementById('deployedBadge');
+  const funnelBody    = document.getElementById('funnelBody');
+  const adminGate     = document.getElementById('adminGate');
+
+  if (state === 'A') {
+    // Sin deploy — login visible, todo lo demás oculto
+    adminLogin.style.display    = 'block';
+    adminPanel.style.display    = 'none';
+    deployedBadge.style.display = 'none';
+    funnelBody.style.display    = 'none';
+    adminGate.style.marginBottom = '0';
+
+  } else if (state === 'B') {
+    // Admin editando — panel admin visible, login oculto
+    adminLogin.style.display    = 'none';
+    adminPanel.style.display    = 'block';
+    deployedBadge.style.display = 'none';
+    // El funnel permanece visible si ya había deploy, para que el admin
+    // pueda ver el resultado mientras edita
+    const hasDeploy = !!localStorage.getItem('pma_deployed');
+    funnelBody.style.display    = hasDeploy ? 'block' : 'none';
+    adminGate.style.marginBottom = hasDeploy ? '20px' : '0';
+
+  } else if (state === 'C') {
+    // Funnel deployado — solo badge visible
+    adminLogin.style.display    = 'none';
+    adminPanel.style.display    = 'none';
+    deployedBadge.style.display = 'block';
+    funnelBody.style.display    = 'block';
+    adminGate.style.marginBottom = '20px';
+  }
+}
+
+/* ── ESTADO A → B: login con contraseña ───────────────────────────────────── */
 function checkAdminPw() {
   const val = document.getElementById('adminPwInput').value;
-  if (val === ADMIN_PASSWORD) {
-    document.getElementById('adminLogin').style.display = 'none';
-
-    // ── Pre-cargar datos existentes en los campos del admin ─────────────────
-    // Si ya hay un funnel deployado, los inputs del admin muestran los datos
-    // actuales para que el admin pueda editarlos y hacer re-deploy.
-    const saved = JSON.parse(localStorage.getItem('pma_deployed') || 'null');
-    if (saved) {
-      if (saved.name)  document.getElementById('adminName').value  = saved.name;
-      if (saved.wa)    document.getElementById('adminWa').value    = saved.wa;
-      if (saved.email) document.getElementById('adminEmail').value = saved.email;
-      if (saved.cta)   document.getElementById('adminCta').value   = saved.cta;
-      // Pre-cargar avatar guardado en el círculo del admin
-      if (saved.avatar) {
-        adminAvatarDataUrl = saved.avatar;
-        document.getElementById('adminAvatarCircle').innerHTML =
-          `<img src="${saved.avatar}" alt="Avatar actual">`;
-      }
-    }
-
-    document.getElementById('adminPanel').style.display = 'block';
-    showToast('✦ ACCESO ADMIN CONCEDIDO');
-  } else {
+  if (val !== ADMIN_PASSWORD) {
     document.getElementById('adminPwError').style.display = 'block';
     document.getElementById('adminPwInput').value = '';
     setTimeout(() => document.getElementById('adminPwError').style.display = 'none', 3000);
+    return;
   }
+
+  // Limpiar campo contraseña por seguridad
+  document.getElementById('adminPwInput').value = '';
+
+  // Pre-cargar datos del deploy actual en los inputs del admin
+  const saved = JSON.parse(localStorage.getItem('pma_deployed') || 'null');
+  if (saved) {
+    document.getElementById('adminName').value  = saved.name  || '';
+    document.getElementById('adminWa').value    = saved.wa    || '';
+    document.getElementById('adminEmail').value = saved.email || '';
+    document.getElementById('adminCta').value   = saved.cta   || '';
+    if (saved.avatar) {
+      adminAvatarDataUrl = saved.avatar;
+      document.getElementById('adminAvatarCircle').innerHTML =
+        `<img src="${saved.avatar}" alt="Avatar actual" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    }
+  }
+
+  setAdminState('B');
+  showToast('✦ ACCESO ADMIN CONCEDIDO · Edita y re-deploya cuando quieras');
+}
+
+/* ── ESTADO C → B: botón "Editar datos del Partner" ──────────────────────── */
+function openAdminEdit() {
+  // Re-cargar datos actuales en los inputs del admin por si cambiaron
+  const saved = JSON.parse(localStorage.getItem('pma_deployed') || 'null');
+  if (saved) {
+    document.getElementById('adminName').value  = saved.name  || '';
+    document.getElementById('adminWa').value    = saved.wa    || '';
+    document.getElementById('adminEmail').value = saved.email || '';
+    document.getElementById('adminCta').value   = saved.cta   || '';
+    if (saved.avatar) {
+      adminAvatarDataUrl = saved.avatar;
+      document.getElementById('adminAvatarCircle').innerHTML =
+        `<img src="${saved.avatar}" alt="Avatar actual" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    }
+  }
+  setAdminState('B');
+  // Scroll suave al panel de configuración
+  document.getElementById('adminGate').scrollIntoView({ behavior: 'smooth' });
+  showToast('✎ MODO EDICIÓN — Modifica los datos y vuelve a deployar');
 }
 
 let adminAvatarDataUrl = '';
@@ -1620,37 +1710,37 @@ function loadAdminAvatar(event) {
   const reader = new FileReader();
   reader.onload = (e) => {
     adminAvatarDataUrl = e.target.result;
-    const circle = document.getElementById('adminAvatarCircle');
-    circle.innerHTML = `<img src="${adminAvatarDataUrl}" alt="Avatar">`;
-    showToast('✦ AVATAR CARGADO PARA EL PARTNER');
+    document.getElementById('adminAvatarCircle').innerHTML =
+      `<img src="${adminAvatarDataUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    showToast('✦ AVATAR CARGADO');
   };
   reader.readAsDataURL(file);
 }
 
+/* ── ESTADO B → C: deploy / re-deploy ────────────────────────────────────── */
 function deployFunnel() {
   const name  = document.getElementById('adminName').value.trim();
   const wa    = document.getElementById('adminWa').value.trim();
   const email = document.getElementById('adminEmail').value.trim();
-  const cta   = document.getElementById('adminCta').value.trim();
+  const cta   = document.getElementById('adminCta').value.trim() ||
+                'Escríbeme para más información personalizada';
 
   if (!name) { showToast('⚠ INGRESA EL NOMBRE DEL PARTNER PRIMERO'); return; }
 
-  // ── Escribir datos en los campos del embudo público ──────────────────────
+  // Escribir datos en los campos del embudo público
   document.getElementById('partnerName').value  = name;
   document.getElementById('partnerWa').value    = wa;
   document.getElementById('partnerEmail').value = email;
-  document.getElementById('partnerCta').value   = cta || 'Escríbeme para más información personalizada';
+  document.getElementById('partnerCta').value   = cta;
 
-  // ── Avatar ────────────────────────────────────────────────────────────────
+  // Avatar
   if (adminAvatarDataUrl) {
     localStorage.setItem('pma_avatar', adminAvatarDataUrl);
     showAvatarPreview(adminAvatarDataUrl);
   }
   updateAvatarNamePreview();
 
-  // ── Bloquear inputs del embudo público (solo lectura para el partner) ─────
-  // Se usa un atributo data-locked para rastrear el estado sin anular eventos
-  // permanentemente en el DOM, evitando congelamientos de interfaz.
+  // Bloquear inputs del embudo público para el partner (readonly)
   ['partnerName','partnerWa','partnerEmail','partnerCta'].forEach(id => {
     const el = document.getElementById(id);
     el.setAttribute('readonly', true);
@@ -1658,52 +1748,41 @@ function deployFunnel() {
     el.style.cursor = 'not-allowed';
   });
 
-  // ── Zona avatar del embudo público: bloquear con data-attr, NO con onclick=null
+  // Bloquear zona avatar pública
   const zone = document.getElementById('avatarUploadZone');
   zone.classList.remove('editable');
   zone.setAttribute('data-locked', 'true');
-  // En lugar de anular onclick, el handler público revisa el flag antes de actuar
   document.getElementById('avatarRemove').style.display = 'none';
   document.getElementById('avatarInput').disabled = true;
 
-  // ── UI: ocultar panel admin, mostrar badge + funnel ───────────────────────
-  document.getElementById('adminPanel').style.display = 'none';
-  document.getElementById('deployedBadge').style.display = 'block';
-  document.getElementById('adminGate').style.marginBottom = '20px';
-  document.getElementById('funnelBody').style.display = 'block';
+  // Persistir
+  localStorage.setItem('pma_deployed', JSON.stringify({ name, wa, email, cta, avatar: adminAvatarDataUrl }));
 
-  // ── Persistir estado deploy ───────────────────────────────────────────────
-  localStorage.setItem('pma_deployed', JSON.stringify({
-    name, wa, email,
-    cta: cta || 'Escríbeme para más información personalizada',
-    avatar: adminAvatarDataUrl
-  }));
+  // Transición a estado C
+  setAdminState('C');
 
-  showToast(`🔒 FUNNEL TROPICALIZADO PARA ${name.toUpperCase()}`);
+  showToast(`🔒 FUNNEL DEPLOYADO PARA ${name.toUpperCase()}`);
   document.getElementById('funnelBody').scrollIntoView({ behavior: 'smooth' });
 }
 
-// ── Restaurar estado de deploy al cargar ────────────────────────────────────
-// Idempotente: puede ejecutarse múltiples veces sin efecto secundario.
-// No anula handlers onclick — usa data-locked como flag para los listeners.
-(function restoreDeploy() {
+/* ── INIT: restaurar estado al cargar la página ───────────────────────────── */
+(function initAdminState() {
   const saved = JSON.parse(localStorage.getItem('pma_deployed') || 'null');
 
   if (saved && saved.name) {
-    // Rellenar campos del embudo público
+    // Hay deploy guardado → Estado C: funnel activo con badge
     document.getElementById('partnerName').value  = saved.name;
-    document.getElementById('partnerWa').value    = saved.wa || '';
+    document.getElementById('partnerWa').value    = saved.wa    || '';
     document.getElementById('partnerEmail').value = saved.email || '';
-    document.getElementById('partnerCta').value   = saved.cta || 'Escríbeme para más información personalizada';
+    document.getElementById('partnerCta').value   = saved.cta   || 'Escríbeme para más información personalizada';
 
-    // Restaurar avatar
     if (saved.avatar) {
       localStorage.setItem('pma_avatar', saved.avatar);
       showAvatarPreview(saved.avatar);
     }
     updateAvatarNamePreview();
 
-    // Bloquear inputs públicos con data-attr (readonly + cursor)
+    // Bloquear campos públicos
     ['partnerName','partnerWa','partnerEmail','partnerCta'].forEach(id => {
       const el = document.getElementById(id);
       el.setAttribute('readonly', true);
@@ -1711,29 +1790,28 @@ function deployFunnel() {
       el.style.cursor = 'not-allowed';
     });
 
-    // Bloquear zona avatar pública con data-attr, sin tocar onclick
     const zone = document.getElementById('avatarUploadZone');
     zone.classList.remove('editable');
     zone.setAttribute('data-locked', 'true');
     document.getElementById('avatarRemove').style.display = 'none';
+    if (document.getElementById('avatarInput')) {
+      document.getElementById('avatarInput').disabled = true;
+    }
 
-    // UI: mostrar funnel deployado, ocultar login y panel admin
-    document.getElementById('adminLogin').style.display   = 'none';
-    document.getElementById('adminPanel').style.display   = 'none';
-    document.getElementById('deployedBadge').style.display = 'block';
-    document.getElementById('funnelBody').style.display   = 'block';
+    setAdminState('C');
 
   } else {
-    // Sin deploy previo: zona avatar del embudo público funciona con delegación
-    // de evento — el click se registra una sola vez con addEventListener,
-    // no con asignación directa a onclick, para evitar duplicaciones.
+    // Sin deploy → Estado A: solo login visible
+    setAdminState('A');
+
+    // Activar zona avatar pública con delegación de evento limpia
     const zone = document.getElementById('avatarUploadZone');
     zone.classList.add('editable');
-    zone.addEventListener('click', function avatarZoneClick() {
+    zone.addEventListener('click', () => {
       if (!zone.getAttribute('data-locked')) {
         document.getElementById('avatarInput').click();
       }
-    }, { once: false });
+    });
   }
 })();
 
