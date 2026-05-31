@@ -1,0 +1,2491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PARTNER MAGNET AI · System Polo | Contenido Inteligente</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root {
+  --ink: #09090F;
+  --deep: #0D0D1A;
+  --panel: #12121F;
+  --surface: #1A1A2E;
+  --indigo: #1E1B4B;
+  --violet: #312E81;
+  --gold: #C9A84C;
+  --gold-lt: #F0D080;
+  --gold-dim: #8B6914;
+  --rose: #E5A0B0;
+  --pearl: #F5F0FA;
+  --mist: rgba(245,240,250,0.55);
+  --cyan: #7FE7F5;
+  --cyan-dim: rgba(127,231,245,0.15);
+  --glow-gold: 0 0 28px rgba(201,168,76,0.45), 0 0 60px rgba(201,168,76,0.15);
+  --glow-violet: 0 0 28px rgba(99,91,212,0.45);
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--ink);
+  color: var(--pearl);
+  font-family: 'Rajdhani', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* ── cosmic background ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 10%, rgba(49,46,129,0.35) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 80% 80%, rgba(99,91,212,0.2) 0%, transparent 70%),
+    radial-gradient(ellipse 80% 40% at 50% 50%, rgba(201,168,76,0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(201,168,76,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── scanner ── */
+.scanner {
+  position: fixed;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  box-shadow: 0 0 16px 3px rgba(127,231,245,0.4);
+  animation: scan 8s linear infinite;
+  z-index: 1;
+  pointer-events: none;
+}
+@keyframes scan { 0% { top: -4px; opacity: 0; } 3% { opacity: 0.7; } 97% { opacity: 0.7; } 100% { top: 100vh; opacity: 0; } }
+
+/* ── layout ── */
+.wrap { max-width: 960px; margin: 0 auto; padding: 0 20px 80px; position: relative; z-index: 2; }
+
+/* ─────────────────────────────────────────
+   ADMIN PANEL STYLES
+───────────────────────────────────────── */
+#adminGate {
+  position: relative;
+  z-index: 10;
+  background: linear-gradient(160deg, rgba(18,18,31,0.98), rgba(9,9,15,0.99));
+  border: 1px solid rgba(201,168,76,0.35);
+  border-radius: 20px;
+  padding: 40px;
+  margin: 30px auto;
+  max-width: 960px;
+  box-shadow: 0 0 60px rgba(201,168,76,0.08), inset 0 1px 0 rgba(201,168,76,0.15);
+}
+#adminGate::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-lt), var(--gold), transparent);
+  border-radius: 20px 20px 0 0;
+}
+.admin-lock-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.45em;
+  color: var(--gold);
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 8px;
+}
+.admin-lock-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--mist);
+  text-align: center;
+  margin-bottom: 28px;
+}
+.admin-pw-row {
+  display: flex;
+  gap: 10px;
+  max-width: 420px;
+  margin: 0 auto;
+}
+.admin-pw-row input {
+  flex: 1;
+  padding: 13px 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 10px;
+  color: var(--pearl);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.9rem;
+  letter-spacing: 0.15em;
+  outline: none;
+}
+.admin-pw-row input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.1); }
+.admin-pw-row button {
+  padding: 13px 22px;
+  background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+  border: none;
+  border-radius: 10px;
+  color: var(--ink);
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.admin-pw-row button:hover { filter: brightness(1.15); transform: translateY(-2px); }
+.admin-pw-error {
+  color: var(--rose);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-align: center;
+  margin-top: 10px;
+  display: none;
+}
+
+/* Admin form panel */
+#adminPanel {
+  display: none;
+}
+.admin-panel-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.4em;
+  color: var(--gold-lt);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.admin-panel-title::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 1px;
+  background: var(--gold);
+  box-shadow: 0 0 8px rgba(201,168,76,0.8);
+}
+.admin-badge {
+  display: inline-block;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.22em;
+  padding: 3px 12px;
+  border-radius: 20px;
+  background: rgba(37,211,102,0.1);
+  border: 1px solid rgba(37,211,102,0.3);
+  color: #7fffb2;
+  margin-bottom: 20px;
+}
+.admin-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+@media(max-width:600px) { .admin-grid { grid-template-columns: 1fr; } }
+.admin-field label {
+  display: block;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.35em;
+  color: var(--cyan);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.admin-field input {
+  width: 100%;
+  padding: 12px 15px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: 10px;
+  color: var(--pearl);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s;
+}
+.admin-field input:focus { border-color: rgba(201,168,76,0.6); box-shadow: 0 0 0 3px rgba(201,168,76,0.08); }
+.admin-avatar-zone {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(255,255,255,0.025);
+  border: 1px dashed rgba(201,168,76,0.35);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-bottom: 20px;
+}
+.admin-avatar-zone:hover { border-color: rgba(201,168,76,0.65); }
+.admin-avatar-circle {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  border: 2px solid rgba(201,168,76,0.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem;
+  background: rgba(201,168,76,0.05);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.admin-avatar-circle img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.admin-lock-btn {
+  width: 100%;
+  padding: 18px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #1E1B4B, #312E81, #1E1B4B);
+  background-size: 200% 100%;
+  color: var(--gold-lt);
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid rgba(201,168,76,0.45);
+  box-shadow: 0 0 30px rgba(201,168,76,0.2);
+  transition: all 0.4s;
+  animation: lockPulse 3s ease-in-out infinite;
+}
+.admin-lock-btn:hover { filter: brightness(1.2); transform: translateY(-3px); box-shadow: var(--glow-gold); }
+@keyframes lockPulse { 0%,100% { box-shadow: 0 0 20px rgba(201,168,76,0.2); } 50% { box-shadow: 0 0 40px rgba(201,168,76,0.4); } }
+
+/* Deployed badge ribbon */
+#deployedBadge {
+  display: none;
+  text-align: center;
+  padding: 10px 0 0;
+}
+.deployed-ribbon {
+  display: inline-block;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.3em;
+  padding: 6px 20px;
+  border-radius: 20px;
+  background: rgba(37,211,102,0.1);
+  border: 1px solid rgba(37,211,102,0.4);
+  color: #7fffb2;
+}
+
+/* Funnel container hidden until deployed */
+#funnelBody { display: none; }
+
+/* ── header ── */
+.hdr {
+  text-align: center;
+  padding: 70px 20px 50px;
+  position: relative;
+}
+.hdr-eyebrow {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.5em;
+  color: var(--cyan);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: block;
+  animation: fadeD 1s ease both;
+}
+.hdr-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1.8rem, 5vw, 3.6rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: 0.04em;
+  margin-bottom: 14px;
+  animation: fadeD 1s 0.2s ease both;
+}
+.hdr-title .gold {
+  background: linear-gradient(135deg, var(--gold-dim), var(--gold), var(--gold-lt), var(--gold), var(--gold-dim));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 300% 100%;
+  animation: shimmer 5s ease-in-out infinite;
+}
+@keyframes shimmer { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+.hdr-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-style: italic;
+  color: var(--mist);
+  animation: fadeD 1s 0.4s ease both;
+}
+@keyframes fadeD { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: none; } }
+
+.hdr-line {
+  width: 260px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  margin: 24px auto;
+  position: relative;
+}
+.hdr-line::before, .hdr-line::after {
+  content: '◆';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.4rem;
+  color: var(--gold);
+}
+.hdr-line::before { left: -8px; }
+.hdr-line::after { right: -8px; }
+
+/* ── tabs ── */
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 14px;
+  padding: 6px;
+  margin-bottom: 36px;
+}
+.tab-btn {
+  flex: 1;
+  padding: 13px 10px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--mist);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.35s;
+  position: relative;
+}
+.tab-btn.active {
+  background: linear-gradient(135deg, rgba(49,46,129,0.8), rgba(30,27,75,0.9));
+  color: var(--gold-lt);
+  border: 1px solid rgba(201,168,76,0.3);
+  box-shadow: var(--glow-violet);
+}
+.tab-btn:hover:not(.active) { background: rgba(255,255,255,0.04); color: var(--pearl); }
+
+/* ── panel ── */
+.panel { display: none; }
+.panel.active { display: block; animation: panelIn 0.5s ease both; }
+@keyframes panelIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* ── card ── */
+.card {
+  background: linear-gradient(160deg, rgba(26,26,46,0.95), rgba(18,18,31,0.98));
+  border: 1px solid rgba(201,168,76,0.18);
+  border-radius: 18px;
+  padding: 36px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-lt), var(--gold), transparent);
+  opacity: 0.6;
+}
+.card-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.35em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.card-title::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 1px;
+  background: var(--gold);
+  box-shadow: 0 0 8px rgba(201,168,76,0.8);
+}
+
+/* ── form ── */
+.field { margin-bottom: 20px; }
+label {
+  display: block;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.35em;
+  color: var(--cyan);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+input[type=text], input[type=email], select, textarea {
+  width: 100%;
+  padding: 13px 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 10px;
+  color: var(--pearl);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  outline: none;
+}
+input[type=text]:focus, input[type=email]:focus, select:focus, textarea:focus {
+  border-color: rgba(201,168,76,0.55);
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.08);
+}
+select option { background: #1A1A2E; color: var(--pearl); }
+textarea { resize: vertical; min-height: 240px; }
+
+/* readonly locked style */
+input[readonly], select[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
+  border-color: rgba(37,211,102,0.25) !important;
+  background: rgba(37,211,102,0.03) !important;
+}
+
+/* ── decade picker ── */
+.decade-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.dec-btn {
+  flex: 1;
+  min-width: 80px;
+  padding: 12px 6px;
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+  color: var(--mist);
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.3s;
+}
+.dec-btn:hover { background: rgba(201,168,76,0.08); border-color: rgba(201,168,76,0.45); color: var(--gold-lt); }
+.dec-btn.sel {
+  background: linear-gradient(135deg, rgba(49,46,129,0.7), rgba(30,27,75,0.9));
+  border-color: var(--gold);
+  color: var(--gold-lt);
+  box-shadow: var(--glow-gold);
+}
+.dec-label { font-size: 0.58rem; color: var(--mist); letter-spacing: 0.1em; margin-top: 4px; }
+
+/* ── grid 2col ── */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media(max-width: 600px) { .g2 { grid-template-columns: 1fr; } .tabs { flex-direction: column; } }
+
+/* ── generate btn ── */
+.gen-btn {
+  width: 100%;
+  padding: 18px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--gold-dim), var(--gold), var(--gold-lt), var(--gold));
+  color: var(--ink);
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: var(--glow-gold);
+  transition: all 0.35s;
+  animation: pulse 3s ease-in-out infinite;
+}
+.gen-btn:hover { filter: brightness(1.15); transform: translateY(-3px); }
+@keyframes pulse { 0%,100% { box-shadow: 0 0 28px rgba(201,168,76,0.45), 0 0 60px rgba(201,168,76,0.15); } 50% { box-shadow: 0 0 45px rgba(201,168,76,0.7), 0 0 90px rgba(201,168,76,0.25); } }
+
+.sec-btn {
+  width: 100%;
+  padding: 15px;
+  margin-top: 10px;
+  border: 1px solid rgba(201,168,76,0.35);
+  border-radius: 12px;
+  background: rgba(201,168,76,0.06);
+  color: var(--gold-lt);
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.sec-btn:hover { background: rgba(201,168,76,0.12); box-shadow: 0 0 16px rgba(201,168,76,0.2); }
+
+/* ── result cards ── */
+.results { margin-top: 32px; }
+.res-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.post-card {
+  background: linear-gradient(135deg, rgba(49,46,129,0.12), rgba(12,12,20,0.95));
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 14px;
+  position: relative;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.post-card:hover { border-color: rgba(201,168,76,0.5); transform: translateX(4px); }
+.post-card::before {
+  content: attr(data-num);
+  position: absolute;
+  right: 18px;
+  top: 14px;
+  font-family: 'Cinzel', serif;
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: rgba(201,168,76,0.07);
+  line-height: 1;
+}
+.post-hook {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--pearl);
+  line-height: 1.45;
+  margin-bottom: 14px;
+}
+.post-body {
+  font-size: 0.88rem;
+  color: rgba(245,240,250,0.6);
+  line-height: 1.6;
+  margin-bottom: 14px;
+  border-left: 2px solid rgba(201,168,76,0.25);
+  padding-left: 12px;
+}
+.post-img {
+  background: rgba(127,231,245,0.06);
+  border: 1px solid rgba(127,231,245,0.2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.78rem;
+  color: var(--cyan);
+  font-family: 'Share Tech Mono', monospace;
+  line-height: 1.55;
+}
+.post-cta {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: rgba(201,168,76,0.07);
+  border: 1px solid rgba(201,168,76,0.18);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  color: var(--gold-lt);
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.04em;
+}
+.copy-chip {
+  display: inline-block;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  color: var(--gold-dim);
+  background: rgba(201,168,76,0.06);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 20px;
+  padding: 3px 10px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.copy-chip:hover { background: rgba(201,168,76,0.14); color: var(--gold-lt); }
+
+/* ── arsenal (base de datos) ── */
+.db-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: flex-end;
+  margin-bottom: 14px;
+}
+.db-entry {
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 10px;
+}
+.db-entry-header {
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  gap: 12px;
+  align-items: flex-start;
+}
+.db-full-text {
+  font-size: 0.88rem;
+  color: var(--pearl);
+  line-height: 1.7;
+  margin-top: 14px;
+  white-space: pre-wrap;
+  background: rgba(255,255,255,0.03);
+  border-left: 2px solid rgba(201,168,76,0.25);
+  padding: 14px 16px;
+  border-radius: 0 8px 8px 0;
+  display: none;
+}
+.db-full-text.open { display: block; }
+.expand-btn {
+  background: none;
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 20px;
+  color: var(--gold-dim);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: all 0.25s;
+  margin-top: 8px;
+  display: inline-block;
+}
+.expand-btn:hover { border-color: var(--gold); color: var(--gold-lt); }
+.db-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+.filter-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+.filter-bar select, .filter-bar input {
+  flex: 1;
+  min-width: 140px;
+  padding: 9px 12px;
+  font-size: 0.85rem;
+}
+.filter-bar button {
+  padding: 9px 18px;
+  border: 1px solid rgba(127,231,245,0.3);
+  border-radius: 8px;
+  background: rgba(127,231,245,0.05);
+  color: var(--cyan);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s;
+}
+.filter-bar button:hover { background: rgba(127,231,245,0.12); }
+.arsenal-count {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: var(--mist);
+  margin-bottom: 14px;
+}
+.tag-producto {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.12em;
+  color: #b8a0f0;
+  background: rgba(184,160,240,0.08);
+  border: 1px solid rgba(184,160,240,0.2);
+  border-radius: 20px;
+  padding: 2px 9px;
+  white-space: nowrap;
+}
+.tag-grupo {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.12em;
+  color: var(--rose);
+  background: rgba(229,160,176,0.07);
+  border: 1px solid rgba(229,160,176,0.2);
+  border-radius: 20px;
+  padding: 2px 9px;
+  white-space: nowrap;
+}
+.db-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+.db-num {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gold);
+  text-align: center;
+}
+.db-text {
+  font-size: 0.88rem;
+  color: var(--pearl);
+  line-height: 1.5;
+}
+.db-tag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  color: var(--cyan);
+  background: rgba(127,231,245,0.07);
+  border: 1px solid rgba(127,231,245,0.2);
+  border-radius: 20px;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+.del-btn {
+  background: rgba(229,160,176,0.08);
+  border: 1px solid rgba(229,160,176,0.2);
+  border-radius: 8px;
+  color: var(--rose);
+  font-size: 0.75rem;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.25s;
+  font-family: 'Share Tech Mono', monospace;
+}
+.del-btn:hover { background: rgba(229,160,176,0.16); }
+
+/* ── tropicalize selector ── */
+.tropi-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 12px;
+  align-items: flex-end;
+  margin-bottom: 16px;
+}
+@media(max-width:600px) { .tropi-row { grid-template-columns: 1fr; } }
+
+.tropi-result {
+  background: linear-gradient(135deg, rgba(49,46,129,0.15), rgba(12,12,20,0.95));
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 14px;
+}
+.tropi-num {
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+.tropi-body {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--pearl);
+  margin-bottom: 14px;
+  white-space: pre-wrap;
+}
+
+/* ── cta container ── */
+.cta-box {
+  background: linear-gradient(135deg, rgba(201,168,76,0.06), rgba(49,46,129,0.1));
+  border: 1px solid rgba(201,168,76,0.28);
+  border-radius: 14px;
+  padding: 22px 24px;
+  margin-top: 14px;
+  font-size: 0.9rem;
+  color: var(--gold-lt);
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  line-height: 1.7;
+  position: relative;
+}
+.cta-box::before {
+  content: '✦ MENSAJE DEL PARTNER ✦';
+  display: block;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.3em;
+  color: var(--gold-dim);
+  margin-bottom: 8px;
+  font-style: normal;
+}
+
+/* ── toast ── */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+  color: var(--ink);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  padding: 12px 28px;
+  border-radius: 30px;
+  box-shadow: var(--glow-gold);
+  z-index: 9999;
+  transition: transform 0.4s ease;
+  pointer-events: none;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ── footer ── */
+.ftag {
+  text-align: center;
+  padding: 40px 20px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.25em;
+  color: rgba(245,240,250,0.18);
+  text-transform: uppercase;
+  position: relative;
+  z-index: 2;
+}
+
+/* ── misc ── */
+.badge {
+  display: inline-block;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: rgba(201,168,76,0.1);
+  border: 1px solid rgba(201,168,76,0.25);
+  color: var(--gold-lt);
+  margin-bottom: 10px;
+}
+/* ── format selector ── */
+.format-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.fmt-btn {
+  flex: 1;
+  min-width: 70px;
+  padding: 10px 6px;
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+  color: var(--mist);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.3s;
+}
+.fmt-btn:hover { background: rgba(201,168,76,0.08); border-color: rgba(201,168,76,0.45); color: var(--gold-lt); }
+.fmt-btn.sel {
+  background: linear-gradient(135deg, rgba(49,46,129,0.7), rgba(30,27,75,0.9));
+  border-color: var(--gold);
+  color: var(--gold-lt);
+  box-shadow: var(--glow-gold);
+}
+.fmt-icon { font-size: 1.1rem; display: block; margin-bottom: 4px; }
+.fmt-label { font-size: 0.55rem; color: var(--mist); margin-top: 2px; }
+
+/* ── offer container ── */
+.offer-container {
+  background: linear-gradient(135deg, rgba(201,168,76,0.07), rgba(49,46,129,0.12));
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 14px;
+  padding: 20px 22px;
+  margin: 16px 0;
+}
+.offer-container-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.32em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.offer-fields { display: flex; gap: 10px; flex-wrap: wrap; }
+.offer-fields input { flex: 1; min-width: 140px; padding: 10px 13px; font-size: 0.9rem; }
+.offer-preview {
+  margin-top: 12px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  color: var(--gold-lt);
+  font-style: italic;
+  line-height: 1.6;
+  min-height: 24px;
+}
+
+/* ── whatsapp cta ── */
+.wa-cta-block {
+  background: linear-gradient(135deg, rgba(37,211,102,0.08), rgba(18,140,67,0.06));
+  border: 1px solid rgba(37,211,102,0.25);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.wa-icon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 8px rgba(37,211,102,0.5));
+}
+.wa-text {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #7fffb2;
+  line-height: 1.5;
+  flex: 1;
+}
+.wa-flags { font-size: 1.1rem; letter-spacing: 0.1em; }
+
+/* ── avatar partner ── */
+.avatar-upload-zone {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px;
+  background: rgba(255,255,255,0.025);
+  border: 1px dashed rgba(201,168,76,0.3);
+  border-radius: 14px;
+  transition: all 0.3s;
+  position: relative;
+}
+.avatar-upload-zone.editable { cursor: pointer; }
+.avatar-upload-zone.editable:hover { border-color: rgba(201,168,76,0.6); background: rgba(201,168,76,0.04); }
+.avatar-preview {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 20px rgba(201,168,76,0.4);
+  flex-shrink: 0;
+  display: none;
+}
+.avatar-placeholder {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  border: 2px dashed rgba(201,168,76,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  flex-shrink: 0;
+  background: rgba(201,168,76,0.05);
+}
+.avatar-copy { flex: 1; }
+.avatar-copy strong {
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  color: var(--gold-lt);
+  display: block;
+  margin-bottom: 6px;
+}
+.avatar-copy span {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.15em;
+  color: var(--mist);
+  line-height: 1.6;
+}
+.avatar-name-preview {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1.15rem;
+  background: linear-gradient(135deg, var(--gold-dim), var(--gold), var(--gold-lt));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-top: 8px;
+  display: block;
+  filter: drop-shadow(0 0 8px rgba(201,168,76,0.3));
+}
+.avatar-remove {
+  position: absolute;
+  top: 8px; right: 10px;
+  background: rgba(229,160,176,0.1);
+  border: 1px solid rgba(229,160,176,0.25);
+  border-radius: 20px;
+  color: var(--rose);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.15em;
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: all 0.25s;
+  display: none;
+}
+.avatar-remove:hover { background: rgba(229,160,176,0.2); }
+.img-prompt-avatar {
+  background: linear-gradient(135deg, rgba(201,168,76,0.06), rgba(49,46,129,0.12));
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-top: 10px;
+}
+.img-prompt-avatar .prompt-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.28em;
+  color: var(--gold-dim);
+  margin-bottom: 8px;
+  display: block;
+}
+.img-prompt-avatar .prompt-brand {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  color: var(--cyan);
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+.img-prompt-avatar .prompt-name-tag {
+  display: inline-block;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--gold-lt);
+  background: rgba(201,168,76,0.08);
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 6px;
+  padding: 2px 10px;
+  margin-top: 6px;
+}
+
+/* ── campaign banner ── */
+.campaign-banner {
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 28px;
+  border: 1px solid rgba(201,168,76,0.25);
+  position: relative;
+  min-height: 60px;
+  background: rgba(255,255,255,0.02);
+}
+.campaign-banner img {
+  width: 100%;
+  display: block;
+  border-radius: 15px;
+  transition: opacity 0.4s;
+}
+.campaign-banner .no-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  color: rgba(245,240,250,0.2);
+  text-transform: uppercase;
+}
+.banner-edit-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.banner-edit-bar input {
+  flex: 1;
+  min-width: 220px;
+  font-size: 0.82rem;
+  padding: 10px 14px;
+}
+.banner-edit-bar button {
+  padding: 10px 20px;
+  border: 1px solid rgba(201,168,76,0.35);
+  border-radius: 10px;
+  background: rgba(201,168,76,0.07);
+  color: var(--gold-lt);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s;
+}
+.banner-edit-bar button:hover { background: rgba(201,168,76,0.15); }
+.banner-edit-bar button.clear {
+  border-color: rgba(229,160,176,0.3);
+  color: var(--rose);
+  background: rgba(229,160,176,0.05);
+}
+.banner-edit-bar button.clear:hover { background: rgba(229,160,176,0.12); }
+.banner-month-tag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.25em;
+  color: var(--gold-dim);
+  text-align: center;
+  margin-top: 8px;
+  margin-bottom: -12px;
+}
+.spacer { height: 16px; }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="scanner"></div>
+
+<!-- ══════════════════════════════════════
+     PANEL DE ADMINISTRACIÓN / TROPICALIZACIÓN
+     Contraseña estática: SystemPolo2026
+════════════════════════════════════════ -->
+<div class="wrap" id="adminWrap">
+  <div id="adminGate">
+
+    <!-- LOGIN -->
+    <div id="adminLogin">
+      <div class="admin-lock-title">🔐 Acceso Administrador · System Polo</div>
+      <div class="admin-lock-sub">Ingresa tu clave para activar el poder de tu funnel personalizado</div>
+      <div class="admin-pw-row">
+        <input type="password" id="adminPwInput" placeholder="Contraseña admin..." onkeydown="if(event.key==='Enter')checkAdminPw()">
+        <button onclick="checkAdminPw()">ENTRAR</button>
+      </div>
+      <div class="admin-pw-error" id="adminPwError">✕ CONTRASEÑA INCORRECTA — INTENTA DE NUEVO</div>
+    </div>
+
+    <!-- ADMIN PANEL (visible tras login) -->
+    <div id="adminPanel">
+      <div class="admin-badge">✦ SYSTEM POLO · MODO CONFIGURACIÓN ACTIVO ✦</div>
+      <div class="admin-panel-title">Personaliza Tu Funnel — Tropicalización de Marca</div>
+
+      <div class="admin-grid">
+        <div class="admin-field">
+          <label>Nombre completo del Partner</label>
+          <input type="text" id="adminName" placeholder="Ej: Alexa Torres">
+        </div>
+        <div class="admin-field">
+          <label>WhatsApp (con código de país)</label>
+          <input type="text" id="adminWa" placeholder="Ej: +52 221 428 2564">
+        </div>
+        <div class="admin-field">
+          <label>Correo de contacto</label>
+          <input type="email" id="adminEmail" placeholder="correo@ejemplo.com">
+        </div>
+        <div class="admin-field">
+          <label>CTA personalizado</label>
+          <input type="text" id="adminCta" placeholder="Ej: Info VIP · Cupos limitados">
+        </div>
+      </div>
+
+      <label style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;letter-spacing:0.35em;color:var(--cyan);text-transform:uppercase;margin-bottom:8px;display:block;">Foto / Avatar del Partner</label>
+      <div class="admin-avatar-zone" onclick="document.getElementById('adminAvatarInput').click()">
+        <div class="admin-avatar-circle" id="adminAvatarCircle">👑</div>
+        <div>
+          <strong style="font-family:'Cinzel',serif;font-size:0.75rem;letter-spacing:0.2em;color:var(--gold-lt);display:block;margin-bottom:6px;">SUBIR FOTO DE MARCA</strong>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;color:var(--mist);">JPG · PNG · WebP — La foto aparecerá en todos los prompts de imagen</span>
+        </div>
+      </div>
+      <input type="file" id="adminAvatarInput" accept="image/*" style="display:none;" onchange="loadAdminAvatar(event)">
+
+      <button class="admin-lock-btn" onclick="deployFunnel()">🔒 LOCK &amp; DEPLOY FUNNEL — TROPICALIZAR PARA ESTE PARTNER</button>
+    </div>
+
+    <!-- Deployed badge -->
+    <div id="deployedBadge">
+      <span class="deployed-ribbon">✦ FUNNEL SYSTEM POLO ACTIVADO · LISTO PARA GENERAR RESULTADOS ✦</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     CUERPO DEL FUNNEL (oculto hasta deploy)
+════════════════════════════════════════ -->
+<div id="funnelBody">
+<div class="wrap">
+
+  <!-- ── BANNER CAMPAÑA MENSUAL ── -->
+  <div id="campaignBannerWrap" style="display:none;">
+    <div class="campaign-banner">
+      <a id="bannerLink" href="#" target="_blank" rel="noopener" onclick="return false;">
+        <img id="bannerImg" src="" alt="Campaña del mes">
+      </a>
+    </div>
+    <div class="banner-month-tag" id="bannerMonthTag"></div>
+    <div style="height:16px;"></div>
+  </div>
+
+  <!-- ── BARRA EDICIÓN BANNER (siempre visible para el admin) ── -->
+  <div class="banner-edit-bar">
+    <input type="text" id="bannerUrlInput"
+      placeholder="Pega aquí el link de ibb.co de tu banner mensual · Ej: https://i.ibb.co/xxxxx/banner.jpg">
+    <input type="text" id="bannerMonthInput"
+      placeholder="Mes · Ej: Junio 2026 — Día del Padre"
+      style="max-width:260px;">
+    <button onclick="applyBanner()">▶ APLICAR BANNER</button>
+    <button class="clear" onclick="clearBanner()">✕ QUITAR</button>
+  </div>
+
+  <!-- ── HEADER ── -->
+  <header class="hdr">
+    <span class="hdr-eyebrow">◈ System Polo · Contenido Inteligente 2026 · Edición Diamante ◈</span>
+    <h1 class="hdr-title">
+      PARTNER <span class="gold">MAGNET</span> AI
+    </h1>
+    <div class="hdr-line"></div>
+    <p class="hdr-sub">Transforma tu energía en resultados · El sistema que convierte tu historia en contenido que vende</p>
+  </header>
+
+  <!-- ── PARTNER CONFIG (read-only tras deploy) ── -->
+  <div class="card">
+    <div class="card-title">Tu Identidad de Marca · La Base de Todo</div>
+
+    <div class="field">
+      <label>Foto / Avatar del Partner (JPG · PNG · WebP)</label>
+      <div class="avatar-upload-zone" id="avatarUploadZone">
+        <div class="avatar-placeholder" id="avatarPlaceholder">👑</div>
+        <img id="avatarPreview" class="avatar-preview" alt="Avatar partner">
+        <div class="avatar-copy">
+          <strong>TU PRESENCIA MAGNÉTICA · FOTO DE MARCA</strong>
+          <span>Tu imagen es tu primer mensaje al mundo.<br>
+          Aparecerá como firma visual de autoridad en cada pieza.<br>
+          Hazla tuya — hazla poderosa.</span>
+          <span class="avatar-name-preview" id="avatarNamePreview"></span>
+        </div>
+        <button class="avatar-remove" id="avatarRemove" onclick="removeAvatar(event)">✕ QUITAR</button>
+      </div>
+      <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="loadAvatar(event)">
+    </div>
+
+    <div class="g2">
+      <div class="field">
+        <label>Nombre del Partner</label>
+        <input type="text" id="partnerName" placeholder="Ej: Alexa Torres" oninput="updateAvatarNamePreview()">
+      </div>
+      <div class="field">
+        <label>WhatsApp (con código de país)</label>
+        <input type="tel" id="partnerWa" placeholder="Ej: +52 221 428 2564">
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label>Correo de Contacto</label>
+        <input type="email" id="partnerEmail" placeholder="correo@ejemplo.com">
+      </div>
+      <div class="field">
+        <label>Tu CTA personalizado</label>
+        <input type="text" id="partnerCta" placeholder="Ej: Info VIP · Cupos limitados">
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TABS ── -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('gen')">✦ Crear Contenido</button>
+    <button class="tab-btn" onclick="switchTab('arsenal')">⬡ Mi Arsenal VIP</button>
+    <button class="tab-btn" onclick="switchTab('tropi')">↺ Potenciar Texto</button>
+  </div>
+
+  <!-- ══════════════════════════════
+       TAB 1 · GENERADOR IA
+  ══════════════════════════════ -->
+  <div id="tab-gen" class="panel active">
+    <div class="card">
+      <div class="card-title">Diseña Tu Pieza de Conversión</div>
+
+      <div class="g2">
+        <div class="field">
+          <label>Nicho Principal</label>
+          <select id="nicheMain" onchange="loadSubnichos()">
+            <option value="Salud & Bienestar">Salud &amp; Bienestar</option>
+            <option value="Belleza Femenina">Belleza Femenina</option>
+            <option value="Cuidado Personal">Cuidado Personal</option>
+            <option value="Hogar & Familia">Hogar &amp; Familia</option>
+            <option value="Nutrición Celular">Nutrición Celular</option>
+            <option value="Longevidad & Antiedad">Longevidad &amp; Antiedad</option>
+            <option value="Salud Hormonal">Salud Hormonal</option>
+            <option value="Salud Digestiva">Salud Digestiva</option>
+            <option value="Salud Mental & Emocional">Salud Mental &amp; Emocional</option>
+            <option value="Energía & Vitalidad">Energía &amp; Vitalidad</option>
+            <option value="Control de Peso">Control de Peso</option>
+            <option value="Inmunología Natural">Inmunología Natural</option>
+            <option value="Cuidado Capilar">Cuidado Capilar</option>
+            <option value="Salud Articular">Salud Articular</option>
+            <option value="Detox & Limpieza">Detox &amp; Limpieza</option>
+            <option value="Fertilidad & Maternidad">Fertilidad &amp; Maternidad</option>
+            <option value="Deporte & Recuperación">Deporte &amp; Recuperación</option>
+            <option value="Libertad Financiera MLM">Libertad Financiera MLM</option>
+            <option value="Emprendimiento para Mamás">Emprendimiento para Mamás</option>
+            <option value="Bienestar Senior 60+">Bienestar Senior 60+</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Subnicho / Padecimiento</label>
+          <select id="subNiche"></select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>¿Qué le quita el sueño a tu cliente ideal? (opcional)</label>
+        <input type="text" id="painPoint" placeholder="Ej: Fatiga al despertar, falta de energía para vivir tu vida">
+      </div>
+
+      <div class="field">
+        <label>¿A qué etapa de vida habla tu contenido?</label>
+        <div class="decade-row" id="decadeRow">
+          <div class="dec-btn" onclick="selDec(this,'20s')" data-d="20s">
+            <div>20s</div>
+            <div class="dec-label">Prevención</div>
+          </div>
+          <div class="dec-btn" onclick="selDec(this,'30s')" data-d="30s">
+            <div>30s</div>
+            <div class="dec-label">Estrés</div>
+          </div>
+          <div class="dec-btn sel" onclick="selDec(this,'40s')" data-d="40s">
+            <div>40s</div>
+            <div class="dec-label">Hormonas</div>
+          </div>
+          <div class="dec-btn" onclick="selDec(this,'50s')" data-d="50s">
+            <div>50s</div>
+            <div class="dec-label">Vitalidad</div>
+          </div>
+          <div class="dec-btn" onclick="selDec(this,'60+')" data-d="60+">
+            <div>60+</div>
+            <div class="dec-label">Legado</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Oferta Irresistible -->
+      <div class="offer-container">
+        <div class="offer-container-title">🔥 GANCHO DE CONVERSIÓN — Dale urgencia a tu oferta</div>
+        <div class="offer-fields">
+          <input type="text" id="offerDiscount" placeholder="Ej: 30% descuento · 2x1 · Envío gratis" oninput="updateOfferPreview()">
+          <input type="text" id="offerDate" placeholder="Válido hasta: 31 mayo 2026" oninput="updateOfferPreview()">
+        </div>
+        <div class="offer-preview" id="offerPreview"></div>
+      </div>
+
+      <button class="gen-btn" onclick="generatePosts()">⚡👑 ACTIVAR 10 PIEZAS DE CONVERSIÓN · System Polo 👑⚡</button>
+    </div>
+
+    <div id="gen-results" class="results hidden"></div>
+  </div>
+
+  <!-- ══════════════════════════════
+       TAB 2 · MI ARSENAL
+  ══════════════════════════════ -->
+  <div id="tab-arsenal" class="panel">
+    <div class="card">
+      <div class="card-title">Sube Tu Contenido Ganador al Arsenal</div>
+      <p style="font-family:'Cormorant Garamond',serif; font-style:italic; color:var(--mist); font-size:0.95rem; margin-bottom:20px; line-height:1.6;">
+        Cada texto que funcionó es oro puro. Guárdalo aquí, clasifícalo y reutilízalo cuando quieras resultados probados.
+      </p>
+
+      <div class="g2">
+        <div class="field">
+          <label>Nicho</label>
+          <select id="dbNiche">
+            <option>Salud &amp; Bienestar</option>
+            <option>Belleza Femenina</option>
+            <option>Cuidado Personal</option>
+            <option>Hogar &amp; Familia</option>
+            <option>Nutrición Celular</option>
+            <option>Longevidad &amp; Antiedad</option>
+            <option>Salud Hormonal</option>
+            <option>Salud Digestiva</option>
+            <option>Salud Mental &amp; Emocional</option>
+            <option>Energía &amp; Vitalidad</option>
+            <option>Control de Peso</option>
+            <option>Inmunología Natural</option>
+            <option>Cuidado Capilar</option>
+            <option>Salud Articular</option>
+            <option>Detox &amp; Limpieza</option>
+            <option>Fertilidad &amp; Maternidad</option>
+            <option>Deporte &amp; Recuperación</option>
+            <option>Libertad Financiera MLM</option>
+            <option>Emprendimiento para Mamás</option>
+            <option>Bienestar Senior 60+</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Padecimiento / Subnicho</label>
+          <input type="text" id="dbPain" placeholder="Ej: Acné, Hipertensión">
+        </div>
+      </div>
+
+      <div class="g2">
+        <div class="field">
+          <label>Producto Immunotec (Ej: Immunocal Azul, Optimizer)</label>
+          <input type="text" id="dbProducto" placeholder="Nombre del producto Immunotec">
+        </div>
+        <div class="field">
+          <label>Grupo / Asunto (Ej: Testimonios, Cierre, Educativo)</label>
+          <input type="text" id="dbGrupo" placeholder="Ej: Testimonios, Cierre, Captación">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Texto del Post Validado — pega todo sin límite de largo</label>
+        <textarea id="dbText" placeholder="Pega aquí el texto completo del post que ya funcionó. Sin límite de caracteres — el sistema guarda todo..." oninput="autoGrow(this)"></textarea>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;letter-spacing:0.18em;color:var(--mist);margin-top:6px;" id="charCount">0 caracteres</div>
+      </div>
+
+      <button class="gen-btn" onclick="saveEntry()">⬡ PROTEGER EN MI ARSENAL VIP</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Mi Arsenal VIP · Contenido que Ya Convierte</div>
+
+      <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; padding:16px; background:rgba(201,168,76,0.04); border:1px solid rgba(201,168,76,0.18); border-radius:12px;">
+        <div style="flex:1; min-width:200px;">
+          <div style="font-family:'Share Tech Mono',monospace; font-size:0.55rem; letter-spacing:0.28em; color:var(--gold); margin-bottom:8px;">⤓ EXPORTAR MI ARSENAL</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="sec-btn" style="flex:1; margin:0; padding:10px 14px; font-size:0.72rem;" onclick="exportArsenal()">⤓ DESCARGAR .JSON</button>
+            <button class="sec-btn" style="flex:1; margin:0; padding:10px 14px; font-size:0.72rem; border-color:rgba(127,231,245,0.35); color:var(--cyan);" onclick="exportArsenalPDF()">⤓ EXPORTAR PDF</button>
+          </div>
+        </div>
+        <div style="width:1px; background:rgba(201,168,76,0.15);"></div>
+        <div style="flex:1; min-width:200px;">
+          <div style="font-family:'Share Tech Mono',monospace; font-size:0.55rem; letter-spacing:0.28em; color:var(--cyan); margin-bottom:8px;">⤒ IMPORTAR ARSENAL VIP</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <label style="flex:1; cursor:pointer;">
+              <div class="sec-btn" style="margin:0; padding:10px 14px; font-size:0.72rem; border-color:rgba(127,231,245,0.35); color:var(--cyan); text-align:center;">⤒ CARGAR ARCHIVO .JSON</div>
+              <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importArsenal(event)">
+            </label>
+          </div>
+          <div style="font-family:'Share Tech Mono',monospace; font-size:0.5rem; letter-spacing:0.12em; color:rgba(245,240,250,0.3); margin-top:7px;">
+            Los textos nuevos se AGREGAN sin borrar los tuyos
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <select id="filterNiche" onchange="renderArsenal()">
+          <option value="">— Todos los nichos —</option>
+          <option>Salud &amp; Bienestar</option><option>Belleza Femenina</option><option>Cuidado Personal</option>
+          <option>Hogar &amp; Familia</option><option>Nutrición Celular</option><option>Longevidad &amp; Antiedad</option>
+          <option>Salud Hormonal</option><option>Salud Digestiva</option><option>Salud Mental &amp; Emocional</option>
+          <option>Energía &amp; Vitalidad</option><option>Control de Peso</option><option>Inmunología Natural</option>
+          <option>Cuidado Capilar</option><option>Salud Articular</option><option>Detox &amp; Limpieza</option>
+          <option>Fertilidad &amp; Maternidad</option><option>Deporte &amp; Recuperación</option>
+          <option>Libertad Financiera MLM</option><option>Emprendimiento para Mamás</option><option>Bienestar Senior 60+</option>
+        </select>
+        <input type="text" id="filterSearch" placeholder="Buscar por producto, grupo o texto..." oninput="renderArsenal()" style="min-width:180px;">
+        <button onclick="clearFilters()">✕ LIMPIAR</button>
+      </div>
+
+      <div class="arsenal-count" id="arsenalCount"></div>
+      <div id="arsenalList">
+        <p style="color:var(--mist); font-style:italic; font-size:0.9rem; text-align:center; padding:20px 0;">
+          Tu arsenal está en blanco — cada gran estrategia empieza con el primer paso. Sube tu primer texto ganador.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       TAB 3 · TROPICALIZAR
+  ══════════════════════════════ -->
+  <div id="tab-tropi" class="panel">
+    <div class="card">
+      <div class="card-title">Multiplica Tu Contenido · Potenciador de Textos</div>
+      <p style="font-family:'Cormorant Garamond',serif; font-style:italic; color:var(--mist); font-size:0.95rem; margin-bottom:20px; line-height:1.6;">
+        Un solo texto ganador puede convertirse en 10 variaciones que llegan a 10 audiencias distintas. Eso es contenido inteligente.
+      </p>
+
+      <div class="tropi-row">
+        <div class="field">
+          <label>Nicho del Arsenal</label>
+          <select id="tropNiche" onchange="loadTropEntries()">
+            <option value="">— Selecciona nicho —</option>
+            <option>Salud &amp; Bienestar</option>
+            <option>Belleza Femenina</option>
+            <option>Cuidado Personal</option>
+            <option>Hogar &amp; Familia</option>
+            <option>Nutrición Celular</option>
+            <option>Longevidad &amp; Antiedad</option>
+            <option>Salud Hormonal</option>
+            <option>Salud Digestiva</option>
+            <option>Salud Mental &amp; Emocional</option>
+            <option>Energía &amp; Vitalidad</option>
+            <option>Control de Peso</option>
+            <option>Inmunología Natural</option>
+            <option>Cuidado Capilar</option>
+            <option>Salud Articular</option>
+            <option>Detox &amp; Limpieza</option>
+            <option>Fertilidad &amp; Maternidad</option>
+            <option>Deporte &amp; Recuperación</option>
+            <option>Libertad Financiera MLM</option>
+            <option>Emprendimiento para Mamás</option>
+            <option>Bienestar Senior 60+</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Número de Texto</label>
+          <select id="tropEntry">
+            <option value="">— Primero elige nicho —</option>
+          </select>
+        </div>
+        <div class="field" style="align-self:flex-end">
+          <button class="gen-btn" style="margin:0; padding:13px 20px; font-size:0.78rem;" onclick="tropicalize()">↺ POTENCIAR AHORA</button>
+        </div>
+      </div>
+
+      <div id="tropPreview" style="display:none;">
+        <div class="badge">TEXTO BASE SELECCIONADO</div>
+        <div class="tropi-body" id="tropBase" style="background:rgba(255,255,255,0.025); border-radius:10px; padding:16px; font-size:0.95rem; color:var(--mist);"></div>
+      </div>
+    </div>
+
+    <div id="tropi-results" class="results hidden"></div>
+  </div>
+
+</div><!-- /wrap -->
+</div><!-- /funnelBody -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<div style="text-align:center; padding:20px 20px 0; position:relative; z-index:2;">
+  <div style="display:inline-flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:16px;">
+    <span style="font-family:'Share Tech Mono',monospace; font-size:0.62rem; letter-spacing:0.28em; padding:6px 18px; border-radius:20px; background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(49,46,129,0.15)); border:1px solid rgba(201,168,76,0.35); color:var(--gold-lt);">#SystemPolo</span>
+    <span style="font-family:'Share Tech Mono',monospace; font-size:0.62rem; letter-spacing:0.28em; padding:6px 18px; border-radius:20px; background:linear-gradient(135deg,rgba(127,231,245,0.08),rgba(49,46,129,0.12)); border:1px solid rgba(127,231,245,0.3); color:var(--cyan);">#IAparaMLM</span>
+  </div>
+  <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:0.95rem; color:rgba(245,240,250,0.35); margin-bottom:4px;">Contenido que conecta · Estrategia que convierte · Resultados que transforman</div>
+</div>
+<footer class="ftag">© 2026 · Partner Magnet AI · System Polo | Contenido Inteligente · Immunotec · #SystemPolo · #IAparaMLM</footer>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   ADMIN GATE — CONTRASEÑA + DEPLOY
+══════════════════════════════════════════════════════ */
+const ADMIN_PASSWORD = "SystemPolo2026";
+
+function checkAdminPw() {
+  const val = document.getElementById('adminPwInput').value;
+  if (val === ADMIN_PASSWORD) {
+    document.getElementById('adminLogin').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    showToast('✦ ACCESO ADMIN CONCEDIDO');
+  } else {
+    document.getElementById('adminPwError').style.display = 'block';
+    document.getElementById('adminPwInput').value = '';
+    setTimeout(() => document.getElementById('adminPwError').style.display = 'none', 3000);
+  }
+}
+
+let adminAvatarDataUrl = '';
+
+function loadAdminAvatar(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    adminAvatarDataUrl = e.target.result;
+    const circle = document.getElementById('adminAvatarCircle');
+    circle.innerHTML = `<img src="${adminAvatarDataUrl}" alt="Avatar">`;
+    showToast('✦ AVATAR CARGADO PARA EL PARTNER');
+  };
+  reader.readAsDataURL(file);
+}
+
+function deployFunnel() {
+  const name  = document.getElementById('adminName').value.trim();
+  const wa    = document.getElementById('adminWa').value.trim();
+  const email = document.getElementById('adminEmail').value.trim();
+  const cta   = document.getElementById('adminCta').value.trim();
+
+  if (!name) { showToast('⚠ INGRESA EL NOMBRE DEL PARTNER PRIMERO'); return; }
+
+  // Escribir datos en el funnel
+  document.getElementById('partnerName').value  = name;
+  document.getElementById('partnerWa').value    = wa;
+  document.getElementById('partnerEmail').value = email;
+  document.getElementById('partnerCta').value   = cta || 'Escríbeme para más información personalizada';
+
+  // Si hay avatar, cargarlo
+  if (adminAvatarDataUrl) {
+    localStorage.setItem('pma_avatar', adminAvatarDataUrl);
+    showAvatarPreview(adminAvatarDataUrl);
+  }
+
+  // Actualizar nombre preview
+  updateAvatarNamePreview();
+
+  // Bloquear campos
+  ['partnerName','partnerWa','partnerEmail','partnerCta'].forEach(id => {
+    const el = document.getElementById(id);
+    el.setAttribute('readonly', true);
+    el.style.cursor = 'not-allowed';
+  });
+
+  // Bloquear zona de avatar — quitar click
+  const zone = document.getElementById('avatarUploadZone');
+  zone.classList.remove('editable');
+  zone.onclick = null;
+  document.getElementById('avatarRemove').style.display = 'none';
+  document.getElementById('avatarInput').disabled = true;
+
+  // Ocultar panel admin, mostrar badge y funnel
+  document.getElementById('adminPanel').style.display = 'none';
+  document.getElementById('deployedBadge').style.display = 'block';
+  document.getElementById('adminGate').style.marginBottom = '20px';
+  document.getElementById('funnelBody').style.display = 'block';
+
+  // Guardar estado deploy en localStorage
+  localStorage.setItem('pma_deployed', JSON.stringify({ name, wa, email, cta, avatar: adminAvatarDataUrl }));
+
+  showToast(`🔒 FUNNEL TROPICALIZADO PARA ${name.toUpperCase()}`);
+  document.getElementById('funnelBody').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Restaurar deploy al cargar (para que el funnel persista)
+(function restoreDeploy() {
+  const saved = JSON.parse(localStorage.getItem('pma_deployed') || 'null');
+  if (saved && saved.name) {
+    document.getElementById('partnerName').value  = saved.name;
+    document.getElementById('partnerWa').value    = saved.wa || '';
+    document.getElementById('partnerEmail').value = saved.email || '';
+    document.getElementById('partnerCta').value   = saved.cta || 'Escríbeme para más información personalizada';
+
+    if (saved.avatar) {
+      localStorage.setItem('pma_avatar', saved.avatar);
+      showAvatarPreview(saved.avatar);
+    }
+    updateAvatarNamePreview();
+
+    // Bloquear campos
+    ['partnerName','partnerWa','partnerEmail','partnerCta'].forEach(id => {
+      const el = document.getElementById(id);
+      el.setAttribute('readonly', true);
+      el.style.cursor = 'not-allowed';
+    });
+
+    const zone = document.getElementById('avatarUploadZone');
+    zone.classList.remove('editable');
+    zone.onclick = null;
+    document.getElementById('avatarRemove').style.display = 'none';
+
+    // Mostrar estado
+    document.getElementById('adminLogin').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'none';
+    document.getElementById('deployedBadge').style.display = 'block';
+    document.getElementById('funnelBody').style.display = 'block';
+  } else {
+    // No hay deploy aún — zona avatar sigue editable
+    document.getElementById('avatarUploadZone').classList.add('editable');
+    document.getElementById('avatarUploadZone').onclick = () => document.getElementById('avatarInput').click();
+  }
+})();
+
+
+/* ══════════════════════════════════════════════
+   DATA
+══════════════════════════════════════════════ */
+const SUBNICHOS = {
+  "Salud & Bienestar": ["Hipertensión","Diabetes tipo 2","Colesterol alto","Resistencia a la insulina","Hipotiroidismo","Insomnio crónico","Migrañas","Fibromialgia","Artritis reumatoide","Osteoporosis"],
+  "Belleza Femenina": ["Acné hormonal","Manchas y melasma","Piel apagada sin luminosidad","Poros dilatados","Flacidez facial","Líneas de expresión","Ojeras y bolsas","Piel seca extrema","Rosácea","Celulitis en muslos"],
+  "Cuidado Personal": ["Mal aliento crónico","Sudoración excesiva","Uñas frágiles","Piel áspera en codos y rodillas","Labios resecos crónicos","Hongos en uñas","Grietas en talones","Dermatitis atópica","Psoriasis leve","Sequedad vaginal"],
+  "Hogar & Familia": ["Alergias del hogar","Productos tóxicos en casa","Niños con baja inmunidad","Estrés de la maternidad","Ansiedad infantil","TDAH en niños","Insomnio familiar","Contaminantes en el agua","Hongos en el hogar","Mascotas y alérgenos"],
+  "Nutrición Celular": ["Déficit de antioxidantes","Glutation bajo","Inflamación crónica","Estrés oxidativo","Permeabilidad intestinal","Absorción deficiente de nutrientes","Microbiota deteriorada","Déficit de Omega-3","Vitamina D baja","Anemia nutricional"],
+  "Longevidad & Antiedad": ["Envejecimiento prematuro","Pérdida de colágeno","Manchas de la edad","Cabello gris prematuro","Pérdida de masa muscular","Piel flácida en el cuerpo","Memoria deteriorada","Visión que baja","Libido disminuida","Telómeros cortos"],
+  "Salud Hormonal": ["Menopausia y sofocos","Síndrome premenstrual severo","Quistes de ovario","Endometriosis","Hipotiroidismo","Cortisol alto por estrés","Testosterona baja","Ovarios poliquísticos (SOP)","Amenorrea","Desequilibrio estrógeno-progesterona"],
+  "Salud Digestiva": ["Estreñimiento crónico","Síndrome de intestino irritable","Reflujo gastroesofágico","Colitis","Gastritis","Distensión abdominal","Intolerancias alimentarias","Colon inflamado","Parásitos intestinales","Diarrea crónica"],
+  "Salud Mental & Emocional": ["Ansiedad generalizada","Depresión leve","Burnout laboral","Estrés crónico","Falta de concentración","Niebla mental (brain fog)","Ataques de pánico","Irritabilidad hormonal","Baja autoestima","Duelo emocional"],
+  "Energía & Vitalidad": ["Fatiga crónica","Cansancio al despertar","Caída de la tarde","Falta de motivación","Bajo rendimiento físico","Somnolencia diurna","Agotamiento adrenal","Anemia ferropénica","Hipoglucemia","Síndrome de fatiga post-viral"],
+  "Control de Peso": ["Obesidad abdominal","Metabolismo lento","Ansiedad por comer dulce","Retención de líquidos","Hipotiroidismo y peso","Rebote tras dieta","Adicción al azúcar","Apetito sin control","Grasa visceral","Pérdida de músculo al bajar de peso"],
+  "Inmunología Natural": ["Infecciones recurrentes","Resfriados frecuentes","Alergias estacionales","Herpes recurrente","Bajo recuento de leucocitos","Inflamación sistémica","Enfermedades autoinmunes leves","Recuperación lenta","Vacunación y refuerzo inmune","Infecciones de vías urinarias"],
+  "Cuidado Capilar": ["Caída del cabello hormonal","Alopecia androgénica","Cabello sin brillo","Puntas abiertas crónicas","Caspa seborreica","Cabello graso en raíz","Cabello teñido dañado","Cabello encrespado","Foliculitis del cuero cabelludo","Calvicie femenina"],
+  "Salud Articular": ["Dolor de rodillas","Artritis","Artrosis","Lumbalgia crónica","Rigidez matutina","Tendinitis","Lesiones deportivas","Gota","Dolor de cuello cervical","Juanetes y pie plano"],
+  "Detox & Limpieza": ["Hígado graso leve","Toxinas acumuladas","Metales pesados","Cándida intestinal","Piel con toxinas (granos)","Aliento de acetona","Orina oscura","Estreñimiento tóxico","Pesticidas y xenoestrógenos","Post-antibióticos"],
+  "Fertilidad & Maternidad": ["Dificultad para embarazarse","SOP y fertilidad","Hipotiroidismo y embarazo","Abortos recurrentes","Período irregular","Preparación preconcepcional","Lactancia y nutrición","Depresión posparto","Anemia en el embarazo","Náuseas del embarazo"],
+  "Deporte & Recuperación": ["Dolor muscular post-entrenamiento","Recuperación lenta","Calambres musculares","Lesiones de ligamentos","Inflamación post-ejercicio","Bajo rendimiento atlético","Pérdida de masa magra","Fatiga en cardio","Hidratación deficiente","Articulaciones desgastadas"],
+  "Libertad Financiera MLM": ["Quemé mi lista de contactos","No sé prospectar sin perseguir","Red que no duplica","Sin tiempo por trabajo fijo","Miedo al rechazo","No sé hacer contenido","Sin dinero para invertir en publicidad","Cero ventas el primer mes","Vergüenza de hablar de la oportunidad","Upline que no apoya"],
+  "Emprendimiento para Mamás": ["Sin tiempo por los hijos","Culpa de trabajar desde casa","Poca credibilidad como empresaria","Ingresos irregulares","Baja autoestima profesional","Miedo a las redes sociales","No sé delegar","Esposo que no apoya","Falta de mentoría femenina","Quiero independencia financiera"],
+  "Bienestar Senior 60+": ["Diabetes tipo 2 en mayores","Hipertensión arterial","Osteoporosis avanzada","Pérdida de memoria","Artrosis de cadera","Cataratas y visión","Incontinencia urinaria","Depresión en la tercera edad","Insomnio senil","Soledad y aislamiento social"]
+};
+
+const DEC_CONTEXT = {
+  "20s": { label: "mujer de 20 años", age: "20 to 25 years old", ctx: "en la mejor etapa para prevenir y brillar", fear: "el tiempo pasa y tu cuerpo ya acumula el costo del estrés sin que lo notes" },
+  "30s": { label: "mujer de 30 a 39 años", age: "30 to 39 years old", ctx: "con carrera, metas y poco tiempo para enfermar", fear: "el estrés crónico y el agotamiento te están robando lo mejor de ti" },
+  "40s": { label: "mujer de 40 a 49 años", age: "40 to 49 years old", ctx: "que exige sentirse y verse de 30", fear: "sientes que tu cuerpo ya no responde igual que antes" },
+  "50s": { label: "mujer de 50 a 59 años", age: "50 to 59 years old", ctx: "que exige vitalidad total sin negociar su calidad de vida", fear: "los cambios hormonales y el paso del tiempo conspiran silenciosamente contra ti" },
+  "60+": { label: "mujer mayor de 60 años", age: "60 to 70 years old", ctx: "con la sabiduría de quien invierte en lo que realmente importa", fear: "la salud es el activo más valioso que existe y no hay edad para recuperarla con la estrategia correcta" }
+};
+
+/* ══════════════════════════════════════════════
+   MAPA DE PRODUCTOS IMMUNOTEC POR SUBNICHO
+   Determina qué producto(s) recomendar según el
+   padecimiento seleccionado
+══════════════════════════════════════════════ */
+const PRODUCTO_MAP = {
+  // Immunocal Azul → salud celular, inmunidad, antioxidante general, glutation
+  default:        { producto: "Immunocal Azul", accion: "eleva los niveles de Glutatión intracelular — el antioxidante maestro que protege cada célula de tu cuerpo", tag: "🔵 Immunocal Azul" },
+
+  // Immunocal Platinum → condiciones inflamatorias crónicas, articulaciones, dolor, mayores
+  articular:      { producto: "Immunocal Platinum", accion: "reduce la inflamación articular crónica, regenera tejido conectivo y eleva el Glutatión con fórmula reforzada para mayor protección", tag: "⚪ Immunocal Platinum" },
+  inflamacion:    { producto: "Immunocal Platinum", accion: "combate la inflamación sistémica desde la raíz celular, elevando Glutatión con potenciadores anti-inflamatorios naturales", tag: "⚪ Immunocal Platinum" },
+  senior:         { producto: "Immunocal Platinum", accion: "en adultos mayores apoya la función inmune, la masa muscular y la vitalidad con fórmula platinum de alta absorción", tag: "⚪ Immunocal Platinum" },
+
+  // Immunocal Sport → rendimiento físico, recuperación, deporte, articulaciones deportivas, energía
+  deporte:        { producto: "Immunocal Sport", accion: "acelera la recuperación muscular, reduce el dolor post-entrenamiento y protege las articulaciones bajo demanda física", tag: "🏅 Immunocal Sport" },
+  recuperacion:   { producto: "Immunocal Sport", accion: "optimiza los procesos de reparación tisular y reconstrucción muscular desde la bioquímica celular", tag: "🏅 Immunocal Sport" },
+
+  // Optimizer → energía, cerebro, concentración, metabolismo
+  energia:        { producto: "Optimizer", accion: "optimiza la producción de energía mitocondrial, la claridad mental y el metabolismo celular con precursores de alta biodisponibilidad", tag: "⚡ Optimizer" },
+  mental:         { producto: "Optimizer", accion: "nutre directamente las funciones cognitivas, reduce el brain fog y mejora el enfoque sostenido durante el día", tag: "⚡ Optimizer" },
+  metabolismo:    { producto: "Optimizer", accion: "reactiva el metabolismo basal, equilibra la glucosa y apoya la función tiroidea desde la base nutricional celular", tag: "⚡ Optimizer" },
+};
+
+/* Función que mapea subnicho → tipo de producto */
+function getProductoData(niche, sub) {
+  const s = (sub + ' ' + niche).toLowerCase();
+  if (/(artritis|artrosis|articular|rodilla|lumbalg|tendinit|gota|rigidez|cervical|juanete)/.test(s)) return PRODUCTO_MAP.articular;
+  if (/(inflamaci|fibromialg|autoinmun|colitis|colon|gastrit|reflujo|intestino)/.test(s)) return PRODUCTO_MAP.inflamacion;
+  if (/(senior|60|mayor|osteoporosis avanz|pérdida de memoria|artrosis de cadera|incontinencia|depresión en la tercera|insomnio senil)/.test(s)) return PRODUCTO_MAP.senior;
+  if (/(deporte|entrenamiento|atlético|masa magra|calambr|ligament|cardio)/.test(s)) return PRODUCTO_MAP.deporte;
+  if (/(recuperación|recuperaci|dolor muscular|lesión|lesiones)/.test(s)) return PRODUCTO_MAP.recuperacion;
+  if (/(fatiga|cansancio|energía|vitalidad|agotamiento|somnolencia|hipoglucemia|síndrome de fatiga)/.test(s)) return PRODUCTO_MAP.energia;
+  if (/(mental|cerebr|concentración|brain fog|niebla|ansiedad|depresión|burnout|cognitiv|enfoque|memoria)/.test(s)) return PRODUCTO_MAP.mental;
+  if (/(metabolismo|peso|obesidad|tiroides|hipotiroidismo|resistencia a la insulina|diabetes|colesterol|glucosa)/.test(s)) return PRODUCTO_MAP.metabolismo;
+  return PRODUCTO_MAP.default;
+}
+
+let selectedDecade = "40s";
+
+/* subnichos */
+function loadSubnichos() {
+  const n = document.getElementById('nicheMain').value;
+  const sel = document.getElementById('subNiche');
+  sel.innerHTML = '';
+  (SUBNICHOS[n] || []).forEach(s => {
+    const o = document.createElement('option');
+    o.value = s; o.textContent = s;
+    sel.appendChild(o);
+  });
+}
+loadSubnichos();
+
+/* decade selector */
+function selDec(el, d) {
+  document.querySelectorAll('.dec-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  selectedDecade = d;
+}
+
+/* ── TAB SWITCHING ── */
+function switchTab(t) {
+  ['gen','arsenal','tropi'].forEach(id => {
+    document.getElementById('tab-'+id).classList.toggle('active', id === t);
+  });
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['gen','arsenal','tropi'][i] === t);
+  });
+}
+
+/* ── PARTNER INFO ── */
+function getPartner() {
+  return {
+    name:   document.getElementById('partnerName').value.trim() || "tu Partner",
+    email:  document.getElementById('partnerEmail').value.trim() || "",
+    wa:     document.getElementById('partnerWa').value.trim() || "",
+    cta:    document.getElementById('partnerCta').value.trim() || "Escríbeme para más información personalizada",
+    avatar: localStorage.getItem('pma_avatar') || ""
+  };
+}
+
+/* ══════════════════════════════════════════════
+   GENERADOR DE POSTS — LÓGICA COHERENTE CON
+   VARIABLES CRUZADAS Y PRODUCTOS IMMUNOTEC
+══════════════════════════════════════════════ */
+const FLOWER_OPENERS = [
+  "🌸👑 ",  "🌺✨ ",  "🌷💛 ",  "🌼👑 ",  "🪷✨ ",
+  "🌸🌿 ",  "💐👑 ",  "🌺💫 ",  "🌹✨ ",  "🌸💛 "
+];
+
+/* HOOKS — 100% coherentes con subnicho + padecimiento */
+const HOOKS = [
+  (n,s,d,dc,pd)=> `${FLOWER_OPENERS[0]}¿Llevas tiempo lidiando con ${s.toLowerCase()} y sientes que nada funciona de verdad? Esta ${dc.label} encontró la respuesta donde menos esperaba: dentro de sus propias células.`,
+  (n,s,d,dc,pd)=> `${FLOWER_OPENERS[1]}3 señales de que tu ${s.toLowerCase()} tiene raíz celular — no solo sintomática. La #2 sorprende a médicos y pacientes por igual.`,
+  (n,s,d,dc,pd)=> `${FLOWER_OPENERS[2]}Lo que nadie te explicó sobre ${s.toLowerCase()}: la ciencia del Glutatión está cambiando los resultados de miles de mujeres en Latinoamérica.`,
+  (n,s,d,dc,pd)=> `${FLOWER_OPENERS[3]}Por qué mujeres de ${d} con ${s.toLowerCase()} no obtienen resultados reales con los métodos convencionales — y qué están haciendo diferente las que sí los tienen.`,
+  (n,s,d,dc,pd)=> `${FLOWER_OPENERS[4]}"Intenté de todo para mi ${s.toLowerCase()} y nada me duró" — hasta que empecé a trabajar desde la nutrición celular con ${pd.tag}.`,
+  (n,s,d,dc,pd)=> `${FLOWER_OPENERS[5]}Si tienes ${s.toLowerCase()}, tu cuerpo está enviando una señal bioquímica urgente: sus niveles de Glutatión están comprometidos y necesita apoyo desde adentro.`,
+  (n,s,d,dc,pd)=> `${FLOWER_OPENERS[6]}Cómo una ${dc.label} con ${s.toLowerCase()} transformó su bienestar en semanas usando suplementación inteligente con ${pd.tag} — sin dietas extremas ni procedimientos invasivos.`,
+  (n,s,d,dc,pd)=> `${FLOWER_OPENERS[7]}El ingrediente que la industria farmacéutica convencional no prioriza para combatir ${s.toLowerCase()}: el Glutatión — y cómo ${pd.tag} ayuda a que tu cuerpo lo produzca en abundancia.`,
+  (n,s,d,dc,pd)=> `${FLOWER_OPENERS[8]}¿Cuánto tiempo más vas a tolerar el ${s.toLowerCase()} esperando que mejore solo? La nutrición celular con precursores de Glutatión tiene resultados que puedes sentir en semanas.`,
+  (n,s,d,dc,pd)=> `${FLOWER_OPENERS[9]}Antes de comprar otro producto para ${s.toLowerCase()}, necesitas saber esto: sin apoyo intracelular, cualquier solución externa es temporal. Aquí está lo que marca la diferencia.`
+];
+
+/* BODIES — Variables cruzadas coherentes: subnicho + dolor + producto Immunotec */
+const BODIES = [
+  (n,s,d,dc,pain,pd)=> `El ${s.toLowerCase()} no aparece de la nada — es la consecuencia visible de un estrés oxidativo acumulado a nivel celular. ${dc.fear}. La buena noticia es que cuando elevas el Glutatión con ${pd.tag}, tu cuerpo recupera su capacidad natural de ${pd.accion}. ${pain ? '💛 Si además experimentas ' + pain + ', esta combinación es especialmente poderosa para ti.' : ''} 🌿✨`,
+
+  (n,s,d,dc,pain,pd)=> `La raíz del ${s.toLowerCase()} no está donde la mayoría busca. Está en la bioquímica celular. Cuando el Glutatión — el antioxidante más poderoso que produce tu propio cuerpo — está bajo, ${dc.fear}. ${pd.tag} ${pd.accion}. Esto no es una promesa vacía: es ciencia de nutrición celular respaldada clínicamente. 🌸`,
+
+  (n,s,d,dc,pain,pd)=> `Millones de mujeres en México y Latinoamérica conviven con ${s.toLowerCase()} sin saber que la solución empieza dentro de cada célula. ${pd.tag} fue formulado para ${pd.accion}. ${pain ? '💛 El ' + pain + ' que también estás sintiendo es otra señal de que tu cuerpo necesita este apoyo.' : ''} Los resultados hablan solos. 🌺`,
+
+  (n,s,d,dc,pain,pd)=> `Como ${dc.label}, ${dc.ctx}. El ${s.toLowerCase()} que estás viviendo tiene solución real si se trabaja correctamente: desde adentro hacia afuera, con ${pd.tag} que ${pd.accion}. No más parches temporales — esta es la estrategia que usan las mujeres que mantienen resultados reales. 🌷`,
+
+  (n,s,d,dc,pain,pd)=> `¿Sabías que el ${s.toLowerCase()} está directamente relacionado con el estrés oxidativo y el descenso del Glutatión intracelular? 🌼 No es solo genética ni azar. Es bioquímica — y con ${pd.tag}, que ${pd.accion}, puedes revertir ese proceso desde la base. ${pain ? 'El ' + pain + ' que sientes también se reduce cuando el cuerpo recupera su equilibrio celular.' : ''} 💫`,
+
+  (n,s,d,dc,pain,pd)=> `Mujeres como tú están resolviendo ${s.toLowerCase()} con un enfoque diferente: la Nutrición Celular avanzada de Immunotec. ${pd.tag} ${pd.accion}. Lo diferente aquí es que no se trata de suprimir síntomas — se trata de darle a tu cuerpo las herramientas exactas que necesita para regenerarse desde adentro. ${pain ? '💛 Incluyendo ese ' + pain + ' que ya llevas tiempo cargando.' : ''} 🌿`,
+
+  (n,s,d,dc,pain,pd)=> `La ciencia es clara: cuando el Glutatión sube, el cuerpo responde. En el caso del ${s.toLowerCase()}, esto significa que ${pd.tag} puede ${pd.accion}. Como ${dc.label} que eres — ${dc.ctx} — esta es la herramienta que faltaba en tu protocolo de bienestar. 🌸✨`,
+
+  (n,s,d,dc,pain,pd)=> `He visto los resultados de frente: mujeres con ${s.toLowerCase()} crónico que en semanas de suplementación con ${pd.tag} reportan cambios reales porque el producto ${pd.accion}. ${dc.fear}, y tú mereces más que eso. ${pain ? '💛 Tu ' + pain + ' también puede mejorar cuando el cuerpo recupera su equilibrio celular.' : ''} 💛`,
+
+  (n,s,d,dc,pain,pd)=> `Si tienes ${s.toLowerCase()} y ya has probado múltiples opciones sin resultados duraderos, la razón puede ser simple: estabas atacando el síntoma, no la raíz. ${pd.tag} de Immunotec ${pd.accion}. Este es el tipo de suplementación inteligente que crea cambios profundos y sostenibles. 🌺👑`,
+
+  (n,s,d,dc,pain,pd)=> `No te hablo de moda ni de tendencia. Te hablo de Glutatión — el antioxidante que tu propio cuerpo necesita para combatir ${s.toLowerCase()} desde adentro. ${pd.tag} ${pd.accion}. ${pain ? 'Y si además tienes ' + pain + ', este protocolo está diseñado para ti.' : ''} Hoy es el día para empezar diferente. 🌼✨`
+];
+
+/* ══════════════════════════════════════════════
+   TROPICALIZE HOOKS — con datos del partner
+══════════════════════════════════════════════ */
+const TROPI_HOOKS = [
+  t => `¿Y si te dijera que miles de mujeres ya están viendo resultados reales con la nutrición celular de Immunotec? La próxima eres tú.`,
+  t => `Muchas mujeres llevan años buscando la respuesta a sus problemas de salud. Hoy puede ser el día que la encuentres.`,
+  t => `Lo que estás a punto de leer ha transformado el bienestar de mujeres en más de 50 países. El Glutatión no es un secreto — pero pocos lo usan correctamente.`,
+  t => `No es coincidencia que estés leyendo esto. Tu cuerpo lleva tiempo pidiendo un apoyo diferente — desde adentro hacia afuera.`,
+  t => `Si alguna vez pensaste "ya probé de todo y nada me dura", esto es exactamente para ti: suplementación inteligente que trabaja a nivel celular.`,
+  t => `Déjame preguntarte algo directamente: ¿cuánto tiempo más vas a convivir con estos síntomas esperando que mejoren solos?`,
+  t => `La diferencia entre las mujeres que logran resultados y las que no suele ser una sola decisión: empezar a trabajar desde la raíz celular.`,
+  t => `Una de mis clientas llegó con exactamente este problema. Tres meses después me mandó un mensaje que me alegró el día — y hoy quiero compartirte lo que hizo.`,
+  t => `No te voy a hablar de restricciones ni de pastillas sintéticas. Te hablaré de lo que la ciencia nutricional comprueba: el poder del Glutatión elevado con Immunotec.`,
+  t => `Comparto esto porque me importa tu resultado más que cualquier otra cosa. Eso es exactamente lo que diferencia al sistema Immunotec.`
+];
+
+/* ══════════════════════════════════════════════
+   PROMPT DE IMAGEN — FORMATO ESTRICTO 1:1
+   HIPERREALISTA PARA GEMINI
+══════════════════════════════════════════════ */
+function buildImgPrompt(niche, sub, dc, avatarName, hasAvatar) {
+  // ── FORMATO FIJO: siempre 1:1 / 1080×1080 ──────────────────────────────
+  // v3 · Expresión psicológica de punto de dolor · Identidad minimalista
+  const hasName = avatarName && avatarName !== 'tu Partner';
+  const partnerNameLine = hasName
+    ? `In the lower right corner, seamlessly and cleanly integrated with absolutely no dark boxes, no black borders and no frames: display exclusively the partner's name "${avatarName}" in a tiny, refined golden cursive typography — Cormorant Garamond Italic style, approximately 14px equivalent size, gradient gold color #C9A84C to #F0D080, soft glow shadow 0 2px 10px rgba(201,168,76,0.45), no black outlines, no background box. Immediately below the name, render a small clean official WhatsApp icon (green #25D366, approximately 12px equivalent) followed by a minimal placeholder line "[Partner WhatsApp Number]" in the same tiny cursive gold style — no frames, no dark backgrounds, no second face.`
+    : `In the lower right corner, render only a small clean official WhatsApp icon (green #25D366) followed by a minimal golden cursive placeholder "[Nombre del Partner]" in tiny Cormorant Garamond Italic, gradient gold #C9A84C to #F0D080 — no borders, no boxes, no faces.`;
+
+  const prompt = [
+    // ── FORMATO Y LUZ ──────────────────────────────────────────────────────
+    `Cinematic hyperrealistic photograph 8K, strictly square format 1:1 ratio 1080x1080px. RAW photographic quality, medium format lens rendering, ultra-fine grain.`,
+
+    // ── ILUMINACIÓN PREMIUM ────────────────────────────────────────────────
+    `High-end studio volumetric lighting in refined Feng Shui style: a dominant soft cool-ivory key light from the upper left at 45 degrees, a barely perceptible warm champagne fill from the right, no harsh cast shadows, no blown-out highlights. Depth of field: sharp foreground subjects, smooth premium bokeh on background.`,
+
+    // ── MUJER · EXPRESIÓN PSICOLÓGICA DE PUNTO DE DOLOR ───────────────────
+    `A white-skinned woman with radiant natural golden hair, apparent age exactly ${dc.age}, seated in a composed and professional posture in her upscale minimalist personal studio space. She wears tasteful elevated casual attire in cream, ivory and muted champagne tones.`,
+    `CRITICAL EXPRESSION RULE — her facial expression must convey: serene thoughtful tension, a slight analytical doubt or questioning look, as if deeply evaluating a health solution or considering a complex problem, professional concern with calm expertise. She is looking slightly off-camera with furrowed brows at a subtle angle, NOT smiling, NOT laughing. Her demeanor is that of a knowledgeable wellness specialist facing a real health challenge with quiet authority.`,
+
+    // ── PRODUCTOS IMMUNOTEC (solo Azul + Platinum) ─────────────────────────
+    `On a clean white minimalist desk in front of her, ONLY the following two Immunotec supplement boxes are perfectly arranged with intentional editorial spacing: ONE box of Immunocal Azul (distinctive blue packaging, clearly legible label), and ONE box of Immunocal Platinum (elegant silver/white premium packaging, platinum finish). STRICTLY NO OTHER PRODUCTS on the desk.`,
+
+    // ── VASO CON LOGO AZUL REY ─────────────────────────────────────────────
+    `Beside the two supplement boxes, a single transparent premium crystal glass filled with a smooth, homogeneous creamy milk-like mixture. On the glass surface, the Immunotec logo is clearly rendered in an elegant Royal Blue color #4169E1 — not white, not gold — with a subtle glossy embossed effect as if engraved into the crystal.`,
+
+    // ── TIPOGRAFÍA DE CONDICIÓN (esquina superior izquierda) ───────────────
+    `In the upper left corner of the image: subtle elegant serif typography displaying the health condition title: "${sub}" — pearl white text, soft warm gold drop-shadow, no harsh black outlines, no background box, naturally integrated into the image composition.`,
+
+    // ── IDENTIDAD MINIMALISTA DEL PARTNER (esquina inferior derecha) ───────
+    partnerNameLine,
+
+    // ── ESTÉTICA GENERAL ───────────────────────────────────────────────────
+    `Overall aesthetic: luxury wellness editorial photography, Vogue México and Architectural Digest premium style. Color palette strictly: cream, ivory, warm gold, champagne, soft whites. Zero pure aggressive blacks anywhere. Background: a softly lit premium personal studio with blurred (bokeh) shelves or neutral wall, no clutter. Photorealistic product rendering with precise label details. Ultra-sharp foreground subjects, silky smooth background transition.`,
+
+    // ── NEGATIVE PROMPT ────────────────────────────────────────────────────
+    `NEGATIVE PROMPT: smiling woman, laughing woman, happy expression, cheerful face, professional smile, toothy smile, Optimizer boxes, Optimizer product, Immunocal Sport box, any supplement box other than Immunocal Azul and Immunocal Platinum, partner portrait avatar, circular photo overlay, face avatar, face portrait, second face in image, dark background, cartoon, illustration, 3D render, CGI-obvious, AI artifacts, harsh black borders, black frames, aggressive dark elements, cluttered desk, multiple products, low resolution, blurry text, watermarks.`
+  ].join('\n\n');
+
+  return prompt;
+}
+
+/* ── GENERATE POSTS ── */
+function generatePosts() {
+  const niche  = document.getElementById('nicheMain').value;
+  const sub    = document.getElementById('subNiche').value;
+  const pain   = document.getElementById('painPoint').value.trim();
+  const dec    = selectedDecade;
+  const dc     = DEC_CONTEXT[dec];
+  const p      = getPartner();
+  const hasAvatar = !!p.avatar;
+  const pd     = getProductoData(niche, sub);  // producto Immunotec mapeado
+
+  // Offer fields
+  const offerDisc  = document.getElementById('offerDiscount')?.value.trim() || "";
+  const offerDate  = document.getElementById('offerDate')?.value.trim() || "";
+  const offerText  = offerDisc && offerDate
+    ? `🔥 ${offerDisc} hasta el ${offerDate}`
+    : offerDisc ? `🔥 ${offerDisc}` : "";
+
+  // WA link
+  const waNum   = p.wa.replace(/\D/g,'');
+  const waMsg   = encodeURIComponent(`Hola ${p.name}, vi tu post sobre ${sub} y quiero más información sobre Immunotec 🌸`);
+  const waLink  = waNum ? `https://wa.me/${waNum}?text=${waMsg}` : "";
+
+  const container = document.getElementById('gen-results');
+  container.innerHTML = `<div class="res-title">🌸👑 10 Posts · ${niche} — ${sub} · ${dec} · ${pd.tag} 👑🌸</div>`;
+  container.classList.remove('hidden');
+
+  for(let i = 0; i < 10; i++) {
+    const hook    = HOOKS[i](niche, sub, dec, dc, pd);
+    const body    = BODIES[i % BODIES.length](niche, sub, dec, dc, pain, pd);
+    const imgProm = buildImgPrompt(niche, sub, dc, p.name, hasAvatar);
+
+    const card = document.createElement('div');
+    card.className = 'post-card';
+    card.setAttribute('data-num', String(i+1).padStart(2,'0'));
+
+    const avatarThumb = hasAvatar
+      ? `<img src="${p.avatar}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);box-shadow:0 0 12px rgba(201,168,76,0.5);flex-shrink:0;" alt="Partner">`
+      : `<div style="width:42px;height:42px;border-radius:50%;border:2px solid rgba(201,168,76,0.3);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">👑</div>`;
+
+    const nameGold = p.name !== 'tu Partner'
+      ? `<span style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1rem;background:linear-gradient(135deg,var(--gold-dim),var(--gold),var(--gold-lt));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 6px rgba(201,168,76,0.4));">${p.name}</span>`
+      : '';
+
+    const offerBlock = offerText
+      ? `<div style="background:linear-gradient(135deg,rgba(201,168,76,0.1),rgba(49,46,129,0.15));border:1px solid rgba(201,168,76,0.35);border-radius:10px;padding:10px 14px;margin:10px 0;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.05rem;color:var(--gold-lt);">${offerText}</div>`
+      : '';
+
+    const waBlock = waLink
+      ? `<div class="wa-cta-block">
+           <span class="wa-icon">💬</span>
+           <div class="wa-text">
+             ${p.cta ? p.cta + '<br>' : ''}
+             <a href="${waLink}" target="_blank" rel="noopener" style="color:#7fffb2;text-decoration:none;">
+               📲 WhatsApp ${p.wa}
+             </a>
+             <span class="wa-flags"> 🇲🇽🇺🇸🇨🇦 Envío a todo destino</span>
+           </div>
+         </div>`
+      : `<div class="post-cta">
+           <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;letter-spacing:0.22em;color:var(--gold-dim);margin-bottom:6px;">✦ CTA ✦</div>
+           ${p.cta}${p.email ? ' · ' + p.email : ''}
+         </div>`;
+
+    card.innerHTML = `
+      <div class="post-hook">${hook}</div>
+      <div class="post-body">${body}</div>
+      ${offerBlock}
+
+      <div class="img-prompt-avatar">
+        <span class="prompt-label">📸 PROMPT GEMINI v3 · 1:1 · 1080×1080px · 8K · DOLOR PSICOLÓGICO · IDENTIDAD MINIMAL · ${pd.tag}</span>
+        <div class="prompt-brand">${imgProm}</div>
+        <div style="margin-top:10px;display:flex;align-items:center;gap:10px;">
+          ${avatarThumb}
+          <div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.52rem;letter-spacing:0.2em;color:var(--gold-dim);margin-bottom:4px;">FIRMA DE MARCA EN LA IMAGEN</div>
+            ${nameGold || '<span class="prompt-name-tag">— sube tu foto arriba —</span>'}
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;">
+        ${waBlock}
+      </div>
+      <span class="copy-chip" onclick="copyPost(this)" style="margin-top:10px;display:inline-block;">⧉ COPIAR POST COMPLETO</span>
+    `;
+    container.appendChild(card);
+  }
+
+  const pdfBtn = document.createElement('button');
+  pdfBtn.className = 'sec-btn';
+  pdfBtn.style.marginTop = '24px';
+  pdfBtn.textContent = '⤓ DESCARGAR GUÍA PDF';
+  pdfBtn.onclick = exportPDF;
+  container.appendChild(pdfBtn);
+
+  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function copyPost(chip) {
+  const card = chip.closest('.post-card');
+  const hookText = card.querySelector('.post-hook').innerText;
+  const bodyText = card.querySelector('.post-body').innerText;
+  const ctaEl = card.querySelector('.post-cta') || card.querySelector('.wa-text');
+  const ctaText = ctaEl ? ctaEl.innerText : '';
+  navigator.clipboard.writeText(hookText + '\n\n' + bodyText + (ctaText ? '\n\n' + ctaText : ''))
+    .then(() => showToast('POST COPIADO AL PORTAPAPELES'));
+}
+
+/* ══════════════════════════════════════════════
+   AVATAR & OFFER
+══════════════════════════════════════════════ */
+function loadAvatar(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    localStorage.setItem('pma_avatar', dataUrl);
+    showAvatarPreview(dataUrl);
+    showToast('✦ FOTO DE MARCA CARGADA');
+  };
+  reader.readAsDataURL(file);
+}
+
+function showAvatarPreview(dataUrl) {
+  const preview     = document.getElementById('avatarPreview');
+  const placeholder = document.getElementById('avatarPlaceholder');
+  const removeBtn   = document.getElementById('avatarRemove');
+  preview.src       = dataUrl;
+  preview.style.display    = 'block';
+  placeholder.style.display = 'none';
+  // Solo mostrar botón remover si no está deployado
+  if (!localStorage.getItem('pma_deployed')) {
+    removeBtn.style.display  = 'block';
+  }
+}
+
+function removeAvatar(e) {
+  e.stopPropagation();
+  localStorage.removeItem('pma_avatar');
+  const preview     = document.getElementById('avatarPreview');
+  const placeholder = document.getElementById('avatarPlaceholder');
+  const removeBtn   = document.getElementById('avatarRemove');
+  preview.src = ''; preview.style.display = 'none';
+  placeholder.style.display = 'flex';
+  removeBtn.style.display  = 'none';
+  document.getElementById('avatarInput').value = '';
+  showToast('FOTO REMOVIDA');
+}
+
+function updateAvatarNamePreview() {
+  const name = document.getElementById('partnerName').value.trim();
+  document.getElementById('avatarNamePreview').textContent = name || '';
+}
+
+function updateOfferPreview() {
+  const disc = document.getElementById('offerDiscount')?.value.trim() || '';
+  const date = document.getElementById('offerDate')?.value.trim() || '';
+  const prev = document.getElementById('offerPreview');
+  if (!prev) return;
+  prev.textContent = disc || date
+    ? `🔥 ${disc}${disc && date ? ' · válido hasta ' : ''}${date}`
+    : '';
+}
+
+// Restore avatar on load (only if no deploy saved — deploy handles it above)
+(function restoreAvatarStandalone() {
+  if (!localStorage.getItem('pma_deployed')) {
+    const saved = localStorage.getItem('pma_avatar');
+    if (saved) showAvatarPreview(saved);
+  }
+})();
+
+
+function autoGrow(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.max(240, el.scrollHeight) + 'px';
+  const cc = document.getElementById('charCount');
+  if (cc) cc.textContent = el.value.length.toLocaleString() + ' caracteres';
+}
+
+function getArsenal() {
+  try { return JSON.parse(localStorage.getItem('pma_arsenal') || '[]'); } catch(e) { return []; }
+}
+function saveArsenal(arr) {
+  try {
+    localStorage.setItem('pma_arsenal', JSON.stringify(arr));
+  } catch(e) {
+    showToast('ALMACENAMIENTO LLENO — EXPORTA TU ARSENAL EN PDF');
+  }
+}
+
+function saveEntry() {
+  const niche    = document.getElementById('dbNiche').value;
+  const pain     = document.getElementById('dbPain').value.trim();
+  const producto = document.getElementById('dbProducto').value.trim();
+  const grupo    = document.getElementById('dbGrupo').value.trim();
+  const text     = document.getElementById('dbText').value.trim();
+  if (!text) { showToast('ESCRIBE O PEGA EL TEXTO PRIMERO'); return; }
+
+  const arr = getArsenal();
+  arr.push({ id: Date.now(), niche, pain, producto, grupo, text });
+  saveArsenal(arr);
+  document.getElementById('dbText').value = '';
+  document.getElementById('dbPain').value = '';
+  document.getElementById('dbProducto').value = '';
+  document.getElementById('dbGrupo').value = '';
+  document.getElementById('dbText').style.height = '240px';
+  document.getElementById('charCount').textContent = '0 caracteres';
+  renderArsenal();
+  showToast('✦ TEXTO GUARDADO EN TU ARSENAL');
+}
+
+function clearFilters() {
+  document.getElementById('filterNiche').value = '';
+  document.getElementById('filterSearch').value = '';
+  renderArsenal();
+}
+
+function renderArsenal() {
+  const all       = getArsenal();
+  const fNiche    = (document.getElementById('filterNiche')?.value  || '').toLowerCase();
+  const fSearch   = (document.getElementById('filterSearch')?.value || '').toLowerCase();
+
+  const arr = all.filter(e => {
+    const matchN = !fNiche  || e.niche.toLowerCase().includes(fNiche);
+    const matchS = !fSearch ||
+      (e.text      || '').toLowerCase().includes(fSearch) ||
+      (e.producto  || '').toLowerCase().includes(fSearch) ||
+      (e.grupo     || '').toLowerCase().includes(fSearch) ||
+      (e.pain      || '').toLowerCase().includes(fSearch);
+    return matchN && matchS;
+  });
+
+  const countEl = document.getElementById('arsenalCount');
+  if (countEl) countEl.textContent = `${arr.length} de ${all.length} textos · ~${Math.round(JSON.stringify(all).length/1024)} KB usados de ~5 MB disponibles`;
+
+  const list = document.getElementById('arsenalList');
+  if (!arr.length) {
+    list.innerHTML = '<p style="color:var(--mist);font-style:italic;font-size:0.9rem;text-align:center;padding:20px 0;">' +
+      (all.length ? 'Sin resultados para ese filtro.' : 'Tu arsenal está vacío. Sube tus primeros textos arriba.') + '</p>';
+    return;
+  }
+  list.innerHTML = '';
+  arr.forEach((e, i) => {
+    const globalIdx = all.findIndex(x => x.id === e.id) + 1;
+    const shortText = e.text.length > 160 ? e.text.substring(0,160) + '…' : e.text;
+    const hasMore   = e.text.length > 160;
+    const row = document.createElement('div');
+    row.className = 'db-entry';
+    row.innerHTML = `
+      <div class="db-entry-header">
+        <div class="db-num">${globalIdx}</div>
+        <div>
+          <div class="db-tags">
+            <span class="db-tag">${e.niche}${e.pain ? ' · ' + e.pain : ''}</span>
+            ${e.producto ? '<span class="tag-producto">📦 ' + e.producto + '</span>' : ''}
+            ${e.grupo    ? '<span class="tag-grupo">🏷 ' + e.grupo + '</span>'       : ''}
+          </div>
+          <div class="db-text" style="margin-top:8px;" id="preview-${e.id}">${shortText}</div>
+          ${hasMore ? `<button class="expand-btn" onclick="toggleText(${e.id}, this)" data-open="0">▾ VER TEXTO COMPLETO</button>` : ''}
+          <div class="db-full-text" id="full-${e.id}">${e.text}</div>
+        </div>
+        <div class="db-actions">
+          <button class="copy-chip" style="margin:0;" onclick="copyArsenalEntry(${e.id})">⧉ COPIAR</button>
+          <button class="del-btn" onclick="deleteEntry(${e.id})">✕</button>
+        </div>
+      </div>
+    `;
+    list.appendChild(row);
+  });
+}
+renderArsenal();
+
+function toggleText(id, btn) {
+  const full = document.getElementById('full-'+id);
+  const preview = document.getElementById('preview-'+id);
+  const isOpen = btn.getAttribute('data-open') === '1';
+  if (isOpen) {
+    full.classList.remove('open');
+    preview.style.display = 'block';
+    btn.textContent = '▾ VER TEXTO COMPLETO';
+    btn.setAttribute('data-open','0');
+  } else {
+    full.classList.add('open');
+    preview.style.display = 'none';
+    btn.textContent = '▴ CONTRAER';
+    btn.setAttribute('data-open','1');
+  }
+}
+
+function copyArsenalEntry(id) {
+  const e = getArsenal().find(x => x.id === id);
+  if (!e) return;
+  navigator.clipboard.writeText(e.text).then(() => showToast('TEXTO COPIADO AL PORTAPAPELES'));
+}
+
+function deleteEntry(id) {
+  if (!confirm('¿Eliminar este texto del arsenal?')) return;
+  const arr = getArsenal().filter(e => e.id !== id);
+  saveArsenal(arr);
+  renderArsenal();
+  showToast('TEXTO ELIMINADO DEL ARSENAL');
+}
+
+/* ══════════════════════════════════════════════
+   TROPICALIZAR
+══════════════════════════════════════════════ */
+function loadTropEntries() {
+  const niche = document.getElementById('tropNiche').value;
+  const sel   = document.getElementById('tropEntry');
+  const arr   = getArsenal().filter(e => !niche || e.niche === niche);
+  sel.innerHTML = arr.length
+    ? arr.map((e,i) => {
+        const label = [e.pain, e.producto, e.grupo].filter(Boolean).join(' · ') || e.niche;
+        return `<option value="${e.id}">${i+1}. ${label.substring(0,50)}</option>`;
+      }).join('')
+    : '<option value="">— Sin textos para este nicho —</option>';
+}
+
+document.getElementById('tropEntry').addEventListener('change', () => {
+  const id  = parseInt(document.getElementById('tropEntry').value);
+  const arr = getArsenal();
+  const e   = arr.find(x => x.id === id);
+  if (e) {
+    document.getElementById('tropBase').textContent = e.text;
+    document.getElementById('tropPreview').style.display = 'block';
+  }
+});
+
+function tropicalize() {
+  const id  = parseInt(document.getElementById('tropEntry').value);
+  const arr = getArsenal();
+  const e   = arr.find(x => x.id === id);
+  if (!e) { showToast('SELECCIONA UN TEXTO DEL ARSENAL'); return; }
+
+  const p = getPartner();
+  const container = document.getElementById('tropi-results');
+  container.innerHTML = `<div class="res-title">◈ 10 Variaciones Tropicalizadas ◈</div>`;
+  container.classList.remove('hidden');
+
+  for (let i = 0; i < 10; i++) {
+    const hook = TROPI_HOOKS[i](e.text);
+    const card = document.createElement('div');
+    card.className = 'tropi-result';
+
+    const waNum  = p.wa.replace(/\D/g,'');
+    const waMsg  = encodeURIComponent(`Hola ${p.name}, vi tu contenido y me interesa saber más 🌸`);
+    const waLink = waNum ? `https://wa.me/${waNum}?text=${waMsg}` : '';
+
+    const ctaContent = waLink
+      ? `<a href="${waLink}" target="_blank" rel="noopener" style="color:#7fffb2;text-decoration:none;">📲 WhatsApp ${p.wa}</a>${p.name !== 'tu Partner' ? ' — <strong style="color:var(--gold-lt);">' + p.name + '</strong>' : ''}${p.email ? ' · ' + p.email : ''}`
+      : `${p.cta}${p.name !== 'tu Partner' ? ' — <strong>' + p.name + '</strong>' : ''}${p.email ? ' · ' + p.email : ''}`;
+
+    card.innerHTML = `
+      <div class="tropi-num">VERSIÓN ${String(i+1).padStart(2,'0')} · ${e.niche}${e.pain ? ' — '+e.pain : ''}</div>
+      <div class="tropi-body">${hook}\n\n${e.text}</div>
+      <div class="cta-box">${ctaContent}</div>
+      <span class="copy-chip" onclick="copyTropi(this)">⧉ COPIAR VERSIÓN COMPLETA</span>
+    `;
+    container.appendChild(card);
+  }
+
+  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function copyTropi(chip) {
+  const card = chip.closest('.tropi-result');
+  const text = card.querySelector('.tropi-body').innerText + '\n\n' + card.querySelector('.cta-box').innerText;
+  navigator.clipboard.writeText(text).then(() => showToast('VERSIÓN COPIADA'));
+}
+
+/* ══════════════════════════════════════════════
+   EXPORTAR / IMPORTAR ARSENAL
+══════════════════════════════════════════════ */
+function exportArsenal() {
+  const arr = getArsenal();
+  if (!arr.length) { showToast('TU ARSENAL ESTÁ VACÍO — AGREGA TEXTOS PRIMERO'); return; }
+
+  const now     = new Date();
+  const stamp   = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+  const partner = (document.getElementById('partnerName').value || 'Arsenal').replace(/\s+/g,'_');
+  const payload = {
+    version: '2.0',
+    exportado: now.toLocaleString('es-MX'),
+    partner,
+    total: arr.length,
+    textos: arr
+  };
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `Arsenal_${partner}_${stamp}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`✦ ARSENAL EXPORTADO · ${arr.length} TEXTOS`);
+}
+
+function exportArsenalPDF() {
+  const { jsPDF } = window.jspdf;
+  const arr = getArsenal();
+  if (!arr.length) { showToast('TU ARSENAL ESTÁ VACÍO'); return; }
+
+  const doc     = new jsPDF();
+  const partner = document.getElementById('partnerName').value || 'Partner';
+  const now     = new Date().toLocaleDateString('es-MX');
+
+  doc.setFontSize(16); doc.setTextColor(30,27,75);
+  doc.text('PARTNER MAGNET AI — MI ARSENAL VIP', 10, 18);
+  doc.setFontSize(10); doc.setTextColor(100,100,140);
+  doc.text(`Partner: ${partner}   |   Fecha: ${now}   |   Total: ${arr.length} textos`, 10, 27);
+  doc.setDrawColor(201,168,76); doc.line(10, 31, 200, 31);
+
+  let y = 40;
+  arr.forEach((e, i) => {
+    if (y > 265) { doc.addPage(); y = 20; }
+    doc.setFont(undefined,'bold'); doc.setFontSize(9); doc.setTextColor(30,27,75);
+    const tags = [e.niche, e.pain, e.producto, e.grupo].filter(Boolean).join(' · ');
+    doc.text(`[${i+1}] ${tags}`, 10, y); y += 6;
+    doc.setFont(undefined,'normal'); doc.setFontSize(8); doc.setTextColor(50,50,80);
+    const lines = doc.splitTextToSize(e.text, 185);
+    lines.forEach(line => {
+      if (y > 270) { doc.addPage(); y = 20; }
+      doc.text(line, 10, y); y += 5;
+    });
+    doc.setDrawColor(220,215,230); doc.line(10, y+2, 200, y+2);
+    y += 8;
+  });
+
+  doc.save(`Arsenal_${partner.replace(/\s+/g,'_')}.pdf`);
+  showToast(`✦ PDF EXPORTADO · ${arr.length} TEXTOS`);
+}
+
+function importArsenal(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const incoming = Array.isArray(data) ? data : (data.textos || []);
+      if (!incoming.length) { showToast('ARCHIVO VACÍO O FORMATO INCORRECTO'); return; }
+
+      const existing  = getArsenal();
+      const existIds  = new Set(existing.map(x => x.id));
+
+      const toAdd = incoming
+        .filter(x => x.text)
+        .map(x => ({
+          ...x,
+          id: existIds.has(x.id) ? Date.now() + Math.random() * 10000 | 0 : x.id
+        }));
+
+      const merged = [...existing, ...toAdd];
+      saveArsenal(merged);
+      renderArsenal();
+      event.target.value = '';
+      showToast(`✦ ${toAdd.length} TEXTOS IMPORTADOS · ARSENAL FUSIONADO`);
+    } catch(err) {
+      showToast('ERROR AL LEER EL ARCHIVO — VERIFICA QUE SEA .JSON VÁLIDO');
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ══════════════════════════════════════════════
+   PDF EXPORT (posts generados)
+══════════════════════════════════════════════ */
+function exportPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const p = getPartner();
+  doc.setFontSize(18);
+  doc.setTextColor(30, 27, 75);
+  doc.text("PARTNER MAGNET AI · Plan de Contenido Immunotec", 10, 20);
+  if (p.name !== 'tu Partner') { doc.setFontSize(12); doc.text("Partner: " + p.name, 10, 32); }
+  doc.setFontSize(11);
+  doc.setTextColor(50, 50, 80);
+  let y = 46;
+  document.querySelectorAll('#gen-results .post-card').forEach((el, i) => {
+    if (y > 260) { doc.addPage(); y = 20; }
+    doc.setFont(undefined, 'bold');
+    doc.setFontSize(10);
+    doc.text(`POST ${i+1}:`, 10, y); y += 7;
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(9);
+    const hookEl = el.querySelector('.post-hook');
+    if (hookEl) {
+      const lines = doc.splitTextToSize(hookEl.innerText, 185);
+      doc.text(lines, 10, y); y += lines.length * 5 + 4;
+    }
+    const bodyEl = el.querySelector('.post-body');
+    if (bodyEl) {
+      const bodyLines = doc.splitTextToSize(bodyEl.innerText, 185);
+      if (y + bodyLines.length * 4 > 270) { doc.addPage(); y = 20; }
+      doc.setTextColor(100, 100, 140);
+      doc.text(bodyLines, 10, y); y += bodyLines.length * 4 + 8;
+      doc.setTextColor(50, 50, 80);
+    }
+  });
+  if (p.email || p.cta) {
+    if (y > 260) { doc.addPage(); y = 20; }
+    doc.setFont(undefined, 'bold');
+    doc.text("CTA: " + p.cta, 10, y); y += 7;
+    if (p.email) { doc.setFont(undefined, 'normal'); doc.text("Email: " + p.email, 10, y); }
+  }
+  doc.save("PartnerMagnetAI_Posts_Immunotec.pdf");
+}
+
+/* ══════════════════════════════════════════════
+   BANNER CAMPAÑA MENSUAL
+══════════════════════════════════════════════ */
+function applyBanner() {
+  let url   = document.getElementById('bannerUrlInput').value.trim();
+  const mes = document.getElementById('bannerMonthInput').value.trim();
+  if (!url) { showToast('PEGA EL LINK DE LA IMAGEN PRIMERO'); return; }
+
+  if (url.includes('ibb.co/') && !url.includes('i.ibb.co/')) {
+    showToast('USA EL LINK DIRECTO DE LA IMAGEN (i.ibb.co/…)');
+    return;
+  }
+
+  document.getElementById('bannerImg').src = url;
+  document.getElementById('bannerLink').href = url;
+  document.getElementById('bannerMonthTag').textContent = mes
+    ? '◈ CAMPAÑA · ' + mes.toUpperCase() + ' ◈'
+    : '';
+  document.getElementById('campaignBannerWrap').style.display = 'block';
+
+  localStorage.setItem('pma_banner', JSON.stringify({ url, mes }));
+  showToast('✦ BANNER DE CAMPAÑA APLICADO');
+}
+
+function clearBanner() {
+  document.getElementById('campaignBannerWrap').style.display = 'none';
+  document.getElementById('bannerUrlInput').value = '';
+  document.getElementById('bannerMonthInput').value = '';
+  localStorage.removeItem('pma_banner');
+  showToast('BANNER REMOVIDO');
+}
+
+(function restoreBanner() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('pma_banner') || 'null');
+    if (saved && saved.url) {
+      document.getElementById('bannerUrlInput').value  = saved.url;
+      document.getElementById('bannerMonthInput').value = saved.mes || '';
+      applyBanner();
+    }
+  } catch(e) {}
+})();
+
+/* ══════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+</script>
+</body>
+</html>
