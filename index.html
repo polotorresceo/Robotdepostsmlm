@@ -1585,6 +1585,24 @@ function checkAdminPw() {
   const val = document.getElementById('adminPwInput').value;
   if (val === ADMIN_PASSWORD) {
     document.getElementById('adminLogin').style.display = 'none';
+
+    // ── Pre-cargar datos existentes en los campos del admin ─────────────────
+    // Si ya hay un funnel deployado, los inputs del admin muestran los datos
+    // actuales para que el admin pueda editarlos y hacer re-deploy.
+    const saved = JSON.parse(localStorage.getItem('pma_deployed') || 'null');
+    if (saved) {
+      if (saved.name)  document.getElementById('adminName').value  = saved.name;
+      if (saved.wa)    document.getElementById('adminWa').value    = saved.wa;
+      if (saved.email) document.getElementById('adminEmail').value = saved.email;
+      if (saved.cta)   document.getElementById('adminCta').value   = saved.cta;
+      // Pre-cargar avatar guardado en el círculo del admin
+      if (saved.avatar) {
+        adminAvatarDataUrl = saved.avatar;
+        document.getElementById('adminAvatarCircle').innerHTML =
+          `<img src="${saved.avatar}" alt="Avatar actual">`;
+      }
+    }
+
     document.getElementById('adminPanel').style.display = 'block';
     showToast('✦ ACCESO ADMIN CONCEDIDO');
   } else {
@@ -1617,84 +1635,105 @@ function deployFunnel() {
 
   if (!name) { showToast('⚠ INGRESA EL NOMBRE DEL PARTNER PRIMERO'); return; }
 
-  // Escribir datos en el funnel
+  // ── Escribir datos en los campos del embudo público ──────────────────────
   document.getElementById('partnerName').value  = name;
   document.getElementById('partnerWa').value    = wa;
   document.getElementById('partnerEmail').value = email;
   document.getElementById('partnerCta').value   = cta || 'Escríbeme para más información personalizada';
 
-  // Si hay avatar, cargarlo
+  // ── Avatar ────────────────────────────────────────────────────────────────
   if (adminAvatarDataUrl) {
     localStorage.setItem('pma_avatar', adminAvatarDataUrl);
     showAvatarPreview(adminAvatarDataUrl);
   }
-
-  // Actualizar nombre preview
   updateAvatarNamePreview();
 
-  // Bloquear campos
+  // ── Bloquear inputs del embudo público (solo lectura para el partner) ─────
+  // Se usa un atributo data-locked para rastrear el estado sin anular eventos
+  // permanentemente en el DOM, evitando congelamientos de interfaz.
   ['partnerName','partnerWa','partnerEmail','partnerCta'].forEach(id => {
     const el = document.getElementById(id);
     el.setAttribute('readonly', true);
+    el.setAttribute('data-locked', 'true');
     el.style.cursor = 'not-allowed';
   });
 
-  // Bloquear zona de avatar — quitar click
+  // ── Zona avatar del embudo público: bloquear con data-attr, NO con onclick=null
   const zone = document.getElementById('avatarUploadZone');
   zone.classList.remove('editable');
-  zone.onclick = null;
+  zone.setAttribute('data-locked', 'true');
+  // En lugar de anular onclick, el handler público revisa el flag antes de actuar
   document.getElementById('avatarRemove').style.display = 'none';
   document.getElementById('avatarInput').disabled = true;
 
-  // Ocultar panel admin, mostrar badge y funnel
+  // ── UI: ocultar panel admin, mostrar badge + funnel ───────────────────────
   document.getElementById('adminPanel').style.display = 'none';
   document.getElementById('deployedBadge').style.display = 'block';
   document.getElementById('adminGate').style.marginBottom = '20px';
   document.getElementById('funnelBody').style.display = 'block';
 
-  // Guardar estado deploy en localStorage
-  localStorage.setItem('pma_deployed', JSON.stringify({ name, wa, email, cta, avatar: adminAvatarDataUrl }));
+  // ── Persistir estado deploy ───────────────────────────────────────────────
+  localStorage.setItem('pma_deployed', JSON.stringify({
+    name, wa, email,
+    cta: cta || 'Escríbeme para más información personalizada',
+    avatar: adminAvatarDataUrl
+  }));
 
   showToast(`🔒 FUNNEL TROPICALIZADO PARA ${name.toUpperCase()}`);
   document.getElementById('funnelBody').scrollIntoView({ behavior: 'smooth' });
 }
 
-// Restaurar deploy al cargar (para que el funnel persista)
+// ── Restaurar estado de deploy al cargar ────────────────────────────────────
+// Idempotente: puede ejecutarse múltiples veces sin efecto secundario.
+// No anula handlers onclick — usa data-locked como flag para los listeners.
 (function restoreDeploy() {
   const saved = JSON.parse(localStorage.getItem('pma_deployed') || 'null');
+
   if (saved && saved.name) {
+    // Rellenar campos del embudo público
     document.getElementById('partnerName').value  = saved.name;
     document.getElementById('partnerWa').value    = saved.wa || '';
     document.getElementById('partnerEmail').value = saved.email || '';
     document.getElementById('partnerCta').value   = saved.cta || 'Escríbeme para más información personalizada';
 
+    // Restaurar avatar
     if (saved.avatar) {
       localStorage.setItem('pma_avatar', saved.avatar);
       showAvatarPreview(saved.avatar);
     }
     updateAvatarNamePreview();
 
-    // Bloquear campos
+    // Bloquear inputs públicos con data-attr (readonly + cursor)
     ['partnerName','partnerWa','partnerEmail','partnerCta'].forEach(id => {
       const el = document.getElementById(id);
       el.setAttribute('readonly', true);
+      el.setAttribute('data-locked', 'true');
       el.style.cursor = 'not-allowed';
     });
 
+    // Bloquear zona avatar pública con data-attr, sin tocar onclick
     const zone = document.getElementById('avatarUploadZone');
     zone.classList.remove('editable');
-    zone.onclick = null;
+    zone.setAttribute('data-locked', 'true');
     document.getElementById('avatarRemove').style.display = 'none';
 
-    // Mostrar estado
-    document.getElementById('adminLogin').style.display = 'none';
-    document.getElementById('adminPanel').style.display = 'none';
+    // UI: mostrar funnel deployado, ocultar login y panel admin
+    document.getElementById('adminLogin').style.display   = 'none';
+    document.getElementById('adminPanel').style.display   = 'none';
     document.getElementById('deployedBadge').style.display = 'block';
-    document.getElementById('funnelBody').style.display = 'block';
+    document.getElementById('funnelBody').style.display   = 'block';
+
   } else {
-    // No hay deploy aún — zona avatar sigue editable
-    document.getElementById('avatarUploadZone').classList.add('editable');
-    document.getElementById('avatarUploadZone').onclick = () => document.getElementById('avatarInput').click();
+    // Sin deploy previo: zona avatar del embudo público funciona con delegación
+    // de evento — el click se registra una sola vez con addEventListener,
+    // no con asignación directa a onclick, para evitar duplicaciones.
+    const zone = document.getElementById('avatarUploadZone');
+    zone.classList.add('editable');
+    zone.addEventListener('click', function avatarZoneClick() {
+      if (!zone.getAttribute('data-locked')) {
+        document.getElementById('avatarInput').click();
+      }
+    }, { once: false });
   }
 })();
 
