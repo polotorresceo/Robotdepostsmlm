@@ -2205,8 +2205,8 @@ function buildImgPrompt(niche, sub, dc, avatarName, hasAvatar) {
   // v3 · Expresión psicológica de punto de dolor · Identidad minimalista
   const hasName = avatarName && avatarName !== 'tu Partner';
   const partnerNameLine = hasName
-    ? `In the lower right corner, seamlessly and cleanly integrated with absolutely no dark boxes, no black borders and no frames: display exclusively the partner's name "${avatarName}" in a tiny, refined golden cursive typography — Cormorant Garamond Italic style, approximately 14px equivalent size, gradient gold color #C9A84C to #F0D080, soft glow shadow 0 2px 10px rgba(201,168,76,0.45), no black outlines, no background box. Immediately below the name, render a small clean official WhatsApp icon (green #25D366, approximately 12px equivalent) followed by a minimal placeholder line "[Partner WhatsApp Number]" in the same tiny cursive gold style — no frames, no dark backgrounds, no second face.`
-    : `In the lower right corner, render only a small clean official WhatsApp icon (green #25D366) followed by a minimal golden cursive placeholder "[Nombre del Partner]" in tiny Cormorant Garamond Italic, gradient gold #C9A84C to #F0D080 — no borders, no boxes, no faces.`;
+    ? `In the lower right corner, seamlessly and cleanly integrated with absolutely no dark boxes, no black borders and no frames: display exclusively the partner's name "${avatarName}" in a tiny, refined golden cursive typography — Cormorant Garamond Italic style, approximately 14px equivalent size, gradient gold color #C9A84C to #F0D080, soft glow shadow 0 2px 10px rgba(201,168,76,0.45), no black outlines, no background box. Immediately below the name, render a small clean official WhatsApp icon (green #25D366, approximately 12px equivalent) followed by the partner WhatsApp number in pure white #FFFFFF — flat, clean, no border, no shadow, no outline, no background box, fully integrated directly over the image — no frames, no dark backgrounds, no second face.`
+    : `In the lower right corner, render only a small clean official WhatsApp icon (green #25D366) followed by a minimal pure white #FFFFFF placeholder "[Nombre del Partner]" in tiny Cormorant Garamond Italic — flat, no border, no shadow, no boxes, no faces.`;
 
   const prompt = [
     // ── FORMATO Y LUZ ──────────────────────────────────────────────────────
@@ -2226,7 +2226,10 @@ function buildImgPrompt(niche, sub, dc, avatarName, hasAvatar) {
     `Beside the two supplement boxes, a single transparent premium crystal glass filled with a smooth, homogeneous creamy milk-like mixture. On the glass surface, the Immunotec logo is clearly rendered in an elegant Royal Blue color #4169E1 — not white, not gold — with a subtle glossy embossed effect as if engraved into the crystal.`,
 
     // ── TIPOGRAFÍA DE CONDICIÓN (esquina superior izquierda) ───────────────
-    `In the upper left corner of the image: subtle elegant serif typography displaying the health condition title: "${sub}" — pearl white text, soft warm gold drop-shadow, no harsh black outlines, no background box, naturally integrated into the image composition.`,
+    `In the upper left corner of the image: subtle elegant serif typography displaying the health condition title: "${sub}" — pearl white text at HALF (50%) the size of a standard title, thin and stylized, soft warm gold drop-shadow, no harsh black outlines, no background box, naturally integrated without competing visually with the face or other elements.`,
+
+    // ── SELLO IDENTIDAD IMMUNOTEC (esquina superior derecha) ──────────────
+    `In the upper right corner of the image: a very small brand identity circle stamp — approximately ONE THIRD (1/3) the size of a standard logo, roughly 36px equivalent diameter — with a vibrant electric blue background (#0047FF) and the word "Immunotec" in clean pure white (#FFFFFF) letters, stylized and perfectly centered within the circle. Flat, minimal, clean — no border, no glow, no drop shadow. Naturally integrated, does not saturate the composition.`,
 
     // ── IDENTIDAD MINIMALISTA DEL PARTNER (esquina inferior derecha) ───────
     partnerNameLine,
@@ -2312,7 +2315,8 @@ function generatePosts() {
 
       <div class="img-prompt-avatar">
         <span class="prompt-label">📸 PROMPT GEMINI v3 · 1:1 · 1080×1080px · 8K · DOLOR PSICOLÓGICO · IDENTIDAD MINIMAL · ${pd.tag}</span>
-        <div class="prompt-brand">${imgProm}</div>
+        <div class="prompt-brand" id="prompt-brand-${i}">${imgProm}</div>
+        <span class="copy-chip" onclick="copyPromptGemini(${i})" style="margin-top:8px;display:inline-block;color:var(--cyan);border-color:rgba(127,231,245,0.25);background:rgba(127,231,245,0.06);">⧉ Copy Prompt Gemini</span>
         <div style="margin-top:10px;display:flex;align-items:center;gap:10px;">
           ${avatarThumb}
           <div>
@@ -2606,6 +2610,12 @@ function tropicalize() {
   }
 
   container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function copyPromptGemini(idx) {
+  const el = document.getElementById('prompt-brand-' + idx);
+  if (!el) return;
+  navigator.clipboard.writeText(el.innerText).then(() => showToast('✦ PROMPT GEMINI COPIADO'));
 }
 
 function copyTropi(chip) {
